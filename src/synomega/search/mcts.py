@@ -73,10 +73,12 @@ class MCTS(SearchAlgorithm):
         self.rollout_depth = rollout_depth
         self.rng = random.Random(seed)
 
-    def run(self, target: str, budget: Budget) -> SearchResult:
+    def run(
+        self, target: str, budget: Budget, *, exclude_target: bool = False
+    ) -> SearchResult:
         budget.start()
         stats = SearchStats()
-        graph = self._make_graph(target)
+        graph = self._make_graph(target, exclude_target=exclude_target)
         root_mol = graph.root
 
         if root_mol.solved:

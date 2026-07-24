@@ -65,8 +65,14 @@ class Planner:
         max_depth: int | None = None,
         time_limit: float | None = None,
         max_expansions: int | None = None,
+        exclude_target: bool = False,
     ) -> SearchResult:
-        """Search for routes to `target`. Budget args override the defaults."""
+        """Search for routes to `target`. Budget args override the defaults.
+
+        `exclude_target=True` treats the target as *not* purchasable even if it
+        is in the stock, so a molecule that is itself a catalogue item is not
+        reported as trivially solved in zero steps.
+        """
         budget = Budget(
             max_depth=(
                 max_depth if max_depth is not None
@@ -81,7 +87,7 @@ class Planner:
                 else self.default_budget["max_expansions"]
             ),
         )
-        return self.searcher.run(target, budget)
+        return self.searcher.run(target, budget, exclude_target=exclude_target)
 
     @property
     def cache_hit_rate(self) -> float:

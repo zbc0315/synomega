@@ -52,7 +52,7 @@ def _build_planner(args):
 
 def cmd_plan(args) -> int:
     planner = _build_planner(args)
-    result = planner.plan(args.target)
+    result = planner.plan(args.target, exclude_target=args.exclude_target)
     print(f"solved: {result.solved}   {result.stats.as_dict()}")
     if result.best_route is not None:
         print()
@@ -76,7 +76,9 @@ def cmd_score(args) -> int:
         for line in Path(args.targets).read_text().splitlines()
         if line.strip() and not line.startswith("#")
     ]
-    report = scorer.score_batch(targets, max_steps=args.max_steps)
+    report = scorer.score_batch(
+        targets, max_steps=args.max_steps, exclude_target=args.exclude_target
+    )
 
     print(report.describe())
     if args.out:
@@ -113,6 +115,10 @@ def main(argv: list[str] | None = None) -> int:
         sp.add_argument("--algorithm", default="retrostar",
                         choices=["retrostar", "bfs", "mcts"])
         sp.add_argument("--max-steps", type=int, default=5)
+        sp.add_argument("--exclude-target", action="store_true",
+                        help="treat the target as not purchasable even if it is "
+                             "in the stock (so a catalogue molecule is not "
+                             "trivially solved in zero steps)")
         sp.add_argument("--expansion-width", type=int, default=50)
         sp.add_argument("--time-limit", type=float, default=60.0)
         sp.add_argument("--max-expansions", type=int, default=500)

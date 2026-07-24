@@ -98,6 +98,10 @@ class AndOrGraph:
 
     root: MolNode
     nodes: dict[str, MolNode] = field(default_factory=dict)
+    #: InChIKeys forced to be treated as *not* in stock for this search (e.g. the
+    #: target molecule when the caller wants to exclude it from the building-block
+    #: set). Carried on the graph because it is per-run state.
+    exclude_keys: frozenset[str] = field(default_factory=frozenset)
 
     @classmethod
     def create(cls, target: Molecule, in_stock: bool) -> "AndOrGraph":

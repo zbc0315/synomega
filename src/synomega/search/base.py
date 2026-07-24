@@ -121,26 +121,48 @@ class SearchAlgorithm(ABC):
         self.expansion_width = expansion_width
 
     @abstractmethod
-    def run(self, target: str, budget: Budget) -> SearchResult:
+    def run(
+        self, target: str, budget: Budget, *, exclude_target: bool = False
+    ) -> SearchResult:
+        """Search for routes to `target`.
+
+        When `exclude_target` is True, the target molecule is treated as *not*
+        purchasable even if it is in the stock — so a molecule that is itself a
+        catalogue item is not reported as trivially solved in zero steps.
+        """
         ...
 
     # ------------------------------------------------------------- helpers
 
-    def _make_graph(self, target: str) -> AndOrGraph:
+    def _in_stock(self, mol: Molecule, exclude_keys: frozenset[str]) -> bool:
+        """Stock membership, minus any keys explicitly excluded for this run."""
+        if exclude_keys and mol.key in exclude_keys:
+            return False
+        return mol in self.stock
+
+    def _make_graph(
+        self, target: str, *, exclude_target: bool = False
+    ) -> AndOrGraph:
         mol = Molecule.of(target)
-        return AndOrGraph.create(mol, in_stock=mol in self.stock)
+        exclude_keys = frozenset({mol.key}) if exclude_target else frozenset()
+        graph = AndOrGraph.create(mol, in_stock=self._in_stock(mol, exclude_keys))
+        graph.exclude_keys = exclude_keys
+        return graph
 
     def _child_nodes(
         self, graph: AndOrGraph, reactant_smiles: tuple[str, ...], depth: int
     ) -> tuple[list[MolNode], int] | None:
         """Materialize reactant nodes. None if any component is unparseable."""
+        exclude_keys = graph.exclude_keys
         nodes: list[MolNode] = []
         created = 0
         for smi in reactant_smiles:
             mol = Molecule.try_of(smi)
             if mol is None:
                 return None
-            node, is_new = graph.get_or_create(mol, depth, in_stock=mol in self.stock)
+            node, is_new = graph.get_or_create(
+                mol, depth, in_stock=self._in_stock(mol, exclude_keys)
+            )
             if is_new:
                 created += 1
             nodes.append(node)

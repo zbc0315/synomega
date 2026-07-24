@@ -30,16 +30,20 @@ class SynthesizabilityScorer:
         max_steps: int = 5,
         time_limit: float | None = None,
         max_expansions: int | None = None,
+        exclude_target: bool = False,
     ) -> MoleculeReport:
         """Score one target.
 
         `max_steps` is the user-facing step limit: the longest route allowed.
+        `exclude_target=True` treats the target as not purchasable even if it is
+        in the stock, so a catalogue molecule is not trivially scored as solved.
         """
         return self.score_detailed(
             smiles,
             max_steps=max_steps,
             time_limit=time_limit,
             max_expansions=max_expansions,
+            exclude_target=exclude_target,
         )[0]
 
     def score_detailed(
@@ -49,6 +53,7 @@ class SynthesizabilityScorer:
         max_steps: int = 5,
         time_limit: float | None = None,
         max_expansions: int | None = None,
+        exclude_target: bool = False,
     ) -> tuple[MoleculeReport, object | None]:
         """Score one target, also returning the underlying `SearchResult`.
 
@@ -63,6 +68,7 @@ class SynthesizabilityScorer:
                 max_depth=max_steps,
                 time_limit=time_limit,
                 max_expansions=max_expansions,
+                exclude_target=exclude_target,
             )
         except Exception as exc:
             return (
@@ -130,6 +136,7 @@ class SynthesizabilityScorer:
         max_steps: int = 5,
         time_limit: float | None = None,
         max_expansions: int | None = None,
+        exclude_target: bool = False,
         progress: bool = True,
         on_result=None,
     ) -> BatchReport:
@@ -154,6 +161,7 @@ class SynthesizabilityScorer:
                 max_steps=max_steps,
                 time_limit=time_limit,
                 max_expansions=max_expansions,
+                exclude_target=exclude_target,
             )
             reports.append(report)
             if on_result is not None:

@@ -55,10 +55,12 @@ class RetroStar(SearchAlgorithm):
 
     # ------------------------------------------------------------------ run
 
-    def run(self, target: str, budget: Budget) -> SearchResult:
+    def run(
+        self, target: str, budget: Budget, *, exclude_target: bool = False
+    ) -> SearchResult:
         budget.start()
         stats = SearchStats()
-        graph = self._make_graph(target)
+        graph = self._make_graph(target, exclude_target=exclude_target)
         root = graph.root
 
         if root.solved:

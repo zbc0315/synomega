@@ -70,6 +70,16 @@ report.mean_bb_coverage
 report.to_dataframe()
 ```
 
+**Excluding the target from stock.** A molecule that is itself a catalogue item
+is otherwise "solved" in zero steps. Pass `exclude_target=True` to force a real
+disconnection — the target is treated as not purchasable, while its intermediates
+still are. Available on both planning and scoring (default off):
+
+```python
+planner.plan("CC(=O)Nc1ccccc1O", exclude_target=True)
+scorer.score("CC(=O)Nc1ccccc1O", max_steps=5, exclude_target=True)
+```
+
 ## Two synthesizability metrics
 
 These are conflated in the literature; synomega keeps them apart because they

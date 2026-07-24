@@ -120,3 +120,33 @@ def test_budget_reports_time_exhaustion():
     budget = Budget(time_limit=0.0, max_expansions=1000)
     budget.start()
     assert budget.exhausted(0) == "time"
+
+
+# ---------------------------------------------------------- exclude target
+
+
+@pytest.mark.parametrize("algo", ALGOS)
+def test_exclude_target_from_stock(algo, fake_model, stock):
+    """A molecule that is itself in stock is trivially solved — unless the
+    caller excludes the target, in which case a real route must be found."""
+    # Acetic acid is purchasable and the toy model cannot make it.
+    planner = Planner(fake_model, stock, algorithm=algo, cache=False)
+
+    normal = planner.plan("CC(=O)O")
+    assert normal.solved
+    assert normal.stats.expansions == 0          # never searched — it's in stock
+
+    excluded = planner.plan("CC(=O)O", exclude_target=True)
+    assert not excluded.solved                   # no route, and not in stock now
+    assert not excluded.graph.root.in_stock
+
+
+@pytest.mark.parametrize("algo", ALGOS)
+def test_exclude_target_still_uses_stock_for_intermediates(algo, fake_model, stock):
+    """Excluding the target must not exclude its (in-stock) reactants."""
+    # Acetanilide -> acetic acid + aniline; aniline -> nitrobenzene (in stock).
+    planner = Planner(fake_model, stock, algorithm=algo, cache=False)
+    result = planner.plan("CC(=O)Nc1ccccc1", exclude_target=True,
+                          max_depth=4, time_limit=10, max_expansions=200)
+    assert result.solved                          # intermediates are still buyable
+    assert not result.graph.root.in_stock
