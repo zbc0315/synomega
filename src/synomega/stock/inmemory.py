@@ -89,6 +89,17 @@ class InMemoryStock(BuildingBlockSet):
         return cls.from_smiles(_iter(), name=name or path.name)
 
     @classmethod
+    def default(cls) -> "InMemoryStock":
+        """Load the default building-block stock, downloading it on first use.
+
+        Convenience for ``from_keys_file(ensure_default_stock())`` — see
+        :mod:`synomega.data`.
+        """
+        from ..data import ensure_default_stock
+
+        return cls.from_keys_file(ensure_default_stock(), name="zinc-default")
+
+    @classmethod
     def from_keys_file(
         cls, path: str | Path, *, name: str | None = None
     ) -> "InMemoryStock":

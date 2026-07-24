@@ -92,6 +92,18 @@ class TemplateGNN(SingleStepModel):
     # ------------------------------------------------------------- loading
 
     @classmethod
+    def default(cls, **kwargs) -> "TemplateGNN":
+        """Load the default pretrained model, downloading it on first use.
+
+        Convenience for ``from_pretrained(ensure_default_model())`` — see
+        :mod:`synomega.data`. Extra keyword args (e.g. ``device``,
+        ``topk_templates``) are forwarded.
+        """
+        from ..data import ensure_default_model
+
+        return cls.from_pretrained(ensure_default_model(), **kwargs)
+
+    @classmethod
     def from_pretrained(
         cls,
         run_dir: str | Path,

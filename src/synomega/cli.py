@@ -25,6 +25,11 @@ def _load_stock(path: str, keys: bool):
 def _load_model(args):
     from .singlestep import TemplateGNN
 
+    # No --model given: download and use the default pretrained model.
+    if not getattr(args, "model", None):
+        return TemplateGNN.default(
+            device=args.device, topk_templates=args.expansion_width
+        )
     return TemplateGNN.from_pretrained(
         args.model,
         templates_path=args.templates,
@@ -35,9 +40,14 @@ def _load_model(args):
 
 def _build_planner(args):
     from .planner import Planner
+    from .stock import InMemoryStock
 
     model = _load_model(args)
-    stock = _load_stock(args.stock, args.stock_is_keys)
+    # No --stock given: download and use the default building-block stock.
+    if not getattr(args, "stock", None):
+        stock = InMemoryStock.default()
+    else:
+        stock = _load_stock(args.stock, args.stock_is_keys)
     return Planner(
         model,
         stock,
@@ -87,6 +97,17 @@ def cmd_score(args) -> int:
     return 0
 
 
+def cmd_download(args) -> int:
+    """Pre-fetch the default model + stock into the local cache."""
+    from .data import cache_dir, ensure_default_assets
+
+    run_dir, stock_path = ensure_default_assets()
+    print(f"model: {run_dir}")
+    print(f"stock: {stock_path}")
+    print(f"cache: {cache_dir()}")
+    return 0
+
+
 def cmd_build_stock(args) -> int:
     """Precompute InChIKeys once so later loads are fast."""
     from .stock import InMemoryStock
@@ -105,11 +126,14 @@ def main(argv: list[str] | None = None) -> int:
     sub = p.add_subparsers(dest="command", required=True)
 
     def add_common(sp):
-        sp.add_argument("--model", required=True,
-                        help="ml-template-gnn run dir containing best.pt")
+        sp.add_argument("--model", default=None,
+                        help="run dir containing best.pt "
+                             "(default: download the pretrained model)")
         sp.add_argument("--templates", default=None,
                         help="label_to_template_smarts.json / templates TSV")
-        sp.add_argument("--stock", required=True, help="building-block file")
+        sp.add_argument("--stock", default=None,
+                        help="building-block file "
+                             "(default: download the ZINC in-stock set)")
         sp.add_argument("--stock-is-keys", action="store_true",
                         help="stock file holds precomputed InChIKeys")
         sp.add_argument("--algorithm", default="retrostar",
@@ -135,6 +159,11 @@ def main(argv: list[str] | None = None) -> int:
     sp_score.add_argument("--targets", required=True, help="one SMILES per line")
     add_common(sp_score)
     sp_score.set_defaults(func=cmd_score)
+
+    sub.add_parser(
+        "download",
+        help="pre-fetch the default model + stock into the local cache",
+    ).set_defaults(func=cmd_download)
 
     sp_stock = sub.add_parser("build-stock", help="catalogue -> InChIKey file")
     sp_stock.add_argument("--catalogue", required=True)

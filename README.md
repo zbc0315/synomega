@@ -30,6 +30,37 @@ pip install "synomega[gnn]"    # + the D-MPNN neural single-step backend (torch)
 The neural backend is an optional extra on purpose: the template-rule backend
 runs anywhere, with no GPU and no PyTorch. Requires Python ≥ 3.10.
 
+## Zero-config quickstart
+
+`pip install synomega` ships only code. The first time you ask for the default
+model or stock, synomega downloads them (a few hundred MB) into
+`~/.cache/synomega` — the same way spaCy and HuggingFace fetch models. So this
+works out of the box:
+
+```python
+import synomega
+
+planner = synomega.load_default_planner()          # downloads model + stock once
+print(planner.plan("CC(=O)Nc1ccccc1O").best_route.describe())
+
+from synomega import SynthesizabilityScorer
+score = SynthesizabilityScorer(planner).score("CC(=O)Nc1ccccc1O", max_steps=5)
+print(score.bb_coverage, score.min_steps)
+```
+
+Or pre-fetch from the command line, then use the CLI with no `--model`/`--stock`:
+
+```bash
+synomega download                                   # cache the default assets
+synomega plan --target "CC(=O)Nc1ccccc1O" --max-steps 5
+```
+
+**Download mirrors.** Assets are hosted on both a USTC GitLab registry (fast in
+China) and (soon) GitHub. synomega auto-selects the faster reachable one by
+latency; override with `SYNOMEGA_MIRROR=ustc|github` or point
+`SYNOMEGA_ASSETS_BASE=<url>` at your own mirror. Change the cache location with
+`SYNOMEGA_CACHE`.
+
 ## Quick start
 
 ```python

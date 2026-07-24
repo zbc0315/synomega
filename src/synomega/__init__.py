@@ -27,7 +27,7 @@ Quick start::
 
 from __future__ import annotations
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from .chem import Molecule, Reaction
 from .planner import Planner
@@ -37,9 +37,32 @@ from .singlestep import Prediction, SingleStepModel
 from .stock import BuildingBlockSet, InMemoryStock
 from .synthesizability import BatchReport, MoleculeReport, SynthesizabilityScorer
 
+def load_default_planner(
+    *, algorithm: str = "retrostar", device: str = "cpu", **planner_kwargs
+) -> "Planner":
+    """A ready-to-use planner backed by the default model + stock.
+
+    Downloads the default pretrained model and building-block stock on first use
+    (see :mod:`synomega.data`), so ``pip install synomega`` works out of the box::
+
+        import synomega
+        planner = synomega.load_default_planner()
+        print(planner.plan("CC(=O)Nc1ccccc1O").best_route.describe())
+
+    The first call fetches a few hundred MB into ``~/.cache/synomega``.
+    """
+    from .singlestep import TemplateGNN
+    from .stock import InMemoryStock
+
+    model = TemplateGNN.default(device=device)
+    stock = InMemoryStock.default()
+    return Planner(model, stock, algorithm=algorithm, **planner_kwargs)
+
+
 __all__ = [
     "__version__",
     "Planner",
+    "load_default_planner",
     "SynthesizabilityScorer",
     "MoleculeReport",
     "BatchReport",
