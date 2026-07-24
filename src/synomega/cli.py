@@ -1,0 +1,144 @@
+"""synomega command line.
+
+    synomega plan  --target "CC(=O)Nc1ccccc1" --model runs/uspto50k_r0_min10 \
+                 --stock emolecules.smi --max-steps 5
+    synomega score --targets targets.smi --model runs/... --stock ... --out report.json
+    synomega build-stock --catalogue emolecules.smi.gz --out emolecules.keys.gz
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+
+def _load_stock(path: str, keys: bool):
+    from .stock import InMemoryStock
+
+    if keys:
+        return InMemoryStock.from_keys_file(path)
+    return InMemoryStock.from_file(path)
+
+
+def _load_model(args):
+    from .singlestep import TemplateGNN
+
+    return TemplateGNN.from_pretrained(
+        args.model,
+        templates_path=args.templates,
+        device=args.device,
+        topk_templates=args.expansion_width,
+    )
+
+
+def _build_planner(args):
+    from .planner import Planner
+
+    model = _load_model(args)
+    stock = _load_stock(args.stock, args.stock_is_keys)
+    return Planner(
+        model,
+        stock,
+        algorithm=args.algorithm,
+        expansion_width=args.expansion_width,
+        max_depth=args.max_steps,
+        time_limit=args.time_limit,
+        max_expansions=args.max_expansions,
+        cache_path=args.cache,
+    )
+
+
+def cmd_plan(args) -> int:
+    planner = _build_planner(args)
+    result = planner.plan(args.target)
+    print(f"solved: {result.solved}   {result.stats.as_dict()}")
+    if result.best_route is not None:
+        print()
+        print(result.best_route.describe())
+        if args.out:
+            Path(args.out).write_text(result.best_route.to_json())
+            print(f"\nsaved -> {args.out}")
+    else:
+        print("no route found")
+    return 0 if result.solved else 1
+
+
+def cmd_score(args) -> int:
+    from .synthesizability import SynthesizabilityScorer
+
+    planner = _build_planner(args)
+    scorer = SynthesizabilityScorer(planner)
+
+    targets = [
+        line.split()[0]
+        for line in Path(args.targets).read_text().splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    report = scorer.score_batch(targets, max_steps=args.max_steps)
+
+    print(report.describe())
+    if args.out:
+        Path(args.out).write_text(report.to_json())
+        print(f"\nsaved -> {args.out}")
+    return 0
+
+
+def cmd_build_stock(args) -> int:
+    """Precompute InChIKeys once so later loads are fast."""
+    from .stock import InMemoryStock
+
+    print(f"reading {args.catalogue} ...", file=sys.stderr)
+    stock = InMemoryStock.from_file(args.catalogue, smiles_column=args.smiles_column)
+    print(f"  {len(stock):,} unique InChIKeys", file=sys.stderr)
+    stock.save_keys(args.out)
+    print(f"saved -> {args.out}", file=sys.stderr)
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(prog="synomega", description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest="command", required=True)
+
+    def add_common(sp):
+        sp.add_argument("--model", required=True,
+                        help="ml-template-gnn run dir containing best.pt")
+        sp.add_argument("--templates", default=None,
+                        help="label_to_template_smarts.json / templates TSV")
+        sp.add_argument("--stock", required=True, help="building-block file")
+        sp.add_argument("--stock-is-keys", action="store_true",
+                        help="stock file holds precomputed InChIKeys")
+        sp.add_argument("--algorithm", default="retrostar",
+                        choices=["retrostar", "bfs", "mcts"])
+        sp.add_argument("--max-steps", type=int, default=5)
+        sp.add_argument("--expansion-width", type=int, default=50)
+        sp.add_argument("--time-limit", type=float, default=60.0)
+        sp.add_argument("--max-expansions", type=int, default=500)
+        sp.add_argument("--device", default=None)
+        sp.add_argument("--cache", default=None, help="SQLite expansion cache path")
+        sp.add_argument("--out", default=None)
+
+    sp_plan = sub.add_parser("plan", help="find routes to one target")
+    sp_plan.add_argument("--target", required=True)
+    add_common(sp_plan)
+    sp_plan.set_defaults(func=cmd_plan)
+
+    sp_score = sub.add_parser("score", help="synthesizability over a target list")
+    sp_score.add_argument("--targets", required=True, help="one SMILES per line")
+    add_common(sp_score)
+    sp_score.set_defaults(func=cmd_score)
+
+    sp_stock = sub.add_parser("build-stock", help="catalogue -> InChIKey file")
+    sp_stock.add_argument("--catalogue", required=True)
+    sp_stock.add_argument("--smiles-column", type=int, default=0)
+    sp_stock.add_argument("--out", required=True)
+    sp_stock.set_defaults(func=cmd_build_stock)
+
+    args = p.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

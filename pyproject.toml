@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synomega"
+version = "0.1.0"
+description = "Retrosynthesis toolkit: single-step prediction, multi-step route planning, synthesizability scoring"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "zbc0315" }]
+keywords = ["retrosynthesis", "cheminformatics", "synthesizability", "rdkit", "route-planning"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "rdkit>=2023.3",
+    "numpy>=1.23",
+]
+
+[project.urls]
+Homepage = "https://github.com/zbc0315/synomega"
+Repository = "https://github.com/zbc0315/synomega"
+Issues = "https://github.com/zbc0315/synomega/issues"
+
+[project.optional-dependencies]
+# Neural single-step backends (D-MPNN template classifier).
+gnn = [
+    "torch>=2.0",
+    "torch_geometric>=2.4",
+    "pyyaml>=6.0",
+]
+viz = ["graphviz>=0.20"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+synomega = "synomega.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
