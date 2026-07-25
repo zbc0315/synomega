@@ -1,4 +1,4 @@
-# synomega
+# SynOmega
 
 [![PyPI](https://img.shields.io/pypi/v/synomega.svg)](https://pypi.org/project/synomega/)
 [![Python](https://img.shields.io/pypi/pyversions/synomega.svg)](https://pypi.org/project/synomega/)
@@ -56,7 +56,7 @@ synomega plan --target "CC(=O)Nc1ccccc1O" --max-steps 5
 ```
 
 **Download mirrors.** Assets are hosted on both a USTC GitLab registry (fast in
-China) and (soon) GitHub. synomega auto-selects the faster reachable one by
+China) and (soon) GitHub. SynOmega auto-selects the faster reachable one by
 latency; override with `SYNOMEGA_MIRROR=ustc|github` or point
 `SYNOMEGA_ASSETS_BASE=<url>` at your own mirror. Change the cache location with
 `SYNOMEGA_CACHE`.
@@ -113,7 +113,7 @@ scorer.score("CC(=O)Nc1ccccc1O", max_steps=5, exclude_target=True)
 
 ## Two synthesizability metrics
 
-These are conflated in the literature; synomega keeps them apart because they
+These are conflated in the literature; SynOmega keeps them apart because they
 answer different questions.
 
 | Metric | Meaning | Use it for |
