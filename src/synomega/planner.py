@@ -25,6 +25,9 @@ class Planner:
         max_expansions: int = 500,
         cache: bool = True,
         cache_path: str | Path | None = None,
+        plausibility=None,
+        plausibility_threshold: float = 0.4,
+        plausibility_kwargs: dict | None = None,
         **algorithm_kwargs,
     ):
         """
@@ -38,11 +41,32 @@ class Planner:
             cache: wrap the model in an expansion cache (strongly recommended —
                 search revisits the same molecules constantly).
             cache_path: persist the cache to SQLite so it survives the process.
+            plausibility: screen every single-step prediction with the dual-tower
+                reaction-plausibility model. Accepts a ``PlausibilityScorer``
+                instance, ``True`` (download+load the default model), or ``None``/
+                ``False`` (off). Candidates whose ``reactants -> target`` scores
+                below ``plausibility_threshold`` are dropped.
+            plausibility_threshold: minimum plausibility to keep a candidate.
+            plausibility_kwargs: extra kwargs for ``PlausibilityFilteredModel``
+                (e.g. ``min_keep``, ``overfetch``, ``rerank``).
         """
         from .search import get_algorithm
 
+        base = model
+        if plausibility is not None and plausibility is not False:
+            from .plausibility import PlausibilityFilteredModel, PlausibilityScorer
+
+            scorer = plausibility
+            if scorer is True:
+                scorer = PlausibilityScorer.default(
+                    device=getattr(model, "device", "cpu"))
+            base = PlausibilityFilteredModel(
+                base, scorer, threshold=plausibility_threshold,
+                **(plausibility_kwargs or {}),
+            )
+        # Filter sits *inside* the cache, so cached expansions are already screened.
         self.model = (
-            CachedModel(model, disk_path=cache_path) if cache else model
+            CachedModel(base, disk_path=cache_path) if cache else base
         )
         self.stock = stock
         self.algorithm_name = algorithm

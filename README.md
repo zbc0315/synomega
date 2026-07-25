@@ -111,6 +111,37 @@ planner.plan("CC(=O)Nc1ccccc1O", exclude_target=True)
 scorer.score("CC(=O)Nc1ccccc1O", max_steps=5, exclude_target=True)
 ```
 
+## Reaction-plausibility filtering
+
+Every single-step prediction is screened by a **mapping-free dual-tower reaction-
+plausibility model**: two shared-encoder D-MPNN towers embed the candidate
+reactants and the target product separately (no atom mapping needed), and score
+how likely those reactants actually give the product. Candidates below a
+threshold are **dropped** — the filter only removes wrong disconnections, it never
+re-ranks the survivors. Because search and synthesizability both expand through
+the single-step model, this screens *every* single-step prediction in the system.
+
+It is **on by default** (threshold `0.4`, calibrated to delete ~0.6% of correct
+disconnections while pruning implausible ones). The model downloads on first use,
+like the default model/stock.
+
+```python
+# on by default:
+planner = synomega.load_default_planner()
+
+# tune or disable:
+planner = synomega.load_default_planner(plausibility_threshold=0.5)
+planner = synomega.load_default_planner(plausibility=False)
+
+# bring your own single-step model + explicit scorer:
+from synomega.plausibility import PlausibilityScorer
+scorer = PlausibilityScorer.default(device="cpu")
+planner = Planner(model, stock, plausibility=scorer, plausibility_threshold=0.4)
+```
+
+Each surviving prediction carries its raw plausibility in
+`prediction.meta["plausibility"]`.
+
 ## Two synthesizability metrics
 
 These are conflated in the literature; SynOmega keeps them apart because they

@@ -93,6 +93,7 @@ _MODEL_FILES = {
     "label_to_template_smarts.json": "label_to_template_smarts_r20.json",
 }
 _STOCK_FILE = "zinc_stock_keys.txt.gz"
+_PLAUSIBILITY_FILE = "plaus_dual-best.pt"
 
 
 def cache_dir() -> Path:
@@ -159,6 +160,17 @@ def ensure_default_stock() -> Path:
     return _ensure(_STOCK_FILE, _STOCK_FILE, cache_dir())
 
 
+def ensure_default_plausibility_model() -> Path:
+    """Download the default dual-tower plausibility checkpoint; return its path.
+
+    ``SYNOMEGA_PLAUSIBILITY_MODEL=/path/to/best.pt`` overrides with a local file.
+    """
+    override = os.environ.get("SYNOMEGA_PLAUSIBILITY_MODEL", "").strip()
+    if override:
+        return Path(override)
+    return _ensure(_PLAUSIBILITY_FILE, _PLAUSIBILITY_FILE, cache_dir())
+
+
 def ensure_default_assets() -> tuple[Path, Path]:
     """Download both the default model and stock. Returns (run_dir, stock_path)."""
     return ensure_default_model(), ensure_default_stock()
@@ -173,6 +185,7 @@ __all__ = [
     "cache_dir",
     "ensure_default_model",
     "ensure_default_stock",
+    "ensure_default_plausibility_model",
     "ensure_default_assets",
     "clear_cache",
 ]

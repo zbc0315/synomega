@@ -27,7 +27,7 @@ Quick start::
 
 from __future__ import annotations
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from .chem import Molecule, Reaction
 from .planner import Planner
@@ -38,7 +38,9 @@ from .stock import BuildingBlockSet, InMemoryStock
 from .synthesizability import BatchReport, MoleculeReport, SynthesizabilityScorer
 
 def load_default_planner(
-    *, algorithm: str = "retrostar", device: str = "cpu", **planner_kwargs
+    *, algorithm: str = "retrostar", device: str = "cpu",
+    plausibility: bool = True, plausibility_threshold: float = 0.4,
+    **planner_kwargs,
 ) -> "Planner":
     """A ready-to-use planner backed by the default model + stock.
 
@@ -50,13 +52,23 @@ def load_default_planner(
         print(planner.plan("CC(=O)Nc1ccccc1O").best_route.describe())
 
     The first call fetches a few hundred MB into ``~/.cache/synomega``.
+
+    By default every single-step prediction is screened by the dual-tower
+    reaction-plausibility model (``plausibility=True``); pass ``plausibility=False``
+    to disable it, or tune ``plausibility_threshold``.
     """
     from .singlestep import TemplateGNN
     from .stock import InMemoryStock
 
     model = TemplateGNN.default(device=device)
     stock = InMemoryStock.default()
-    return Planner(model, stock, algorithm=algorithm, **planner_kwargs)
+    scorer = None
+    if plausibility:
+        from .plausibility import PlausibilityScorer
+
+        scorer = PlausibilityScorer.default(device=device)
+    return Planner(model, stock, algorithm=algorithm, plausibility=scorer,
+                   plausibility_threshold=plausibility_threshold, **planner_kwargs)
 
 
 __all__ = [
