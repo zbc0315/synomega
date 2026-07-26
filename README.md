@@ -143,6 +143,24 @@ planner = Planner(model, stock, plausibility=scorer, plausibility_threshold=0.4)
 When enabled, each surviving prediction carries its raw plausibility in
 `prediction.meta["plausibility"]`.
 
+## Simplification-constrained model
+
+An alternative single-step model is restricted, at the reaction-template level, to
+**simplifying (fragmentation) disconnections** — those that split the target into
+two or more precursors. In multi-step search it reaches purchasable material with
+fewer node expansions at matched solvability (about 30% fewer expansions and ~2x
+faster median search on a drug-like benchmark; see [`benchmark/`](benchmark/) and
+the accompanying paper). It downloads on first use like the default model:
+
+```python
+planner = synomega.load_default_planner(simplify=True)   # fragmentation-only model
+
+from synomega.singlestep import TemplateGNN
+model = TemplateGNN.simplify(device="cpu")               # or load it directly
+```
+
+Override the download with `SYNOMEGA_SIMPLIFY_MODEL=/path/to/run_dir`.
+
 ## Two synthesizability metrics
 
 These are conflated in the literature; SynOmega keeps them apart because they

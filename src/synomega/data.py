@@ -92,6 +92,13 @@ _MODEL_FILES = {
     # Renamed so TemplateGNN.from_pretrained auto-discovers it in the run dir.
     "label_to_template_smarts.json": "label_to_template_smarts_r20.json",
 }
+# Simplification-constrained single-step model (fragmentation-only templates):
+# proposes only disconnections that split the target, giving cheaper multi-step
+# search at matched solvability. Same file layout as the default model.
+_SIMPLIFY_MODEL_FILES = {
+    "best.pt": "r20_center_simplify-best.pt",
+    "label_to_template_smarts.json": "label_to_template_smarts_r20_simplify.json",
+}
 _STOCK_FILE = "zinc_stock_keys.txt.gz"
 _PLAUSIBILITY_FILE = "plaus_dual-best.pt"
 
@@ -155,6 +162,20 @@ def ensure_default_model() -> Path:
     return run
 
 
+def ensure_simplify_model() -> Path:
+    """Download the simplification-constrained model files; return the run dir.
+
+    ``SYNOMEGA_SIMPLIFY_MODEL=/path/to/run_dir`` overrides with a local run dir.
+    """
+    override = os.environ.get("SYNOMEGA_SIMPLIFY_MODEL", "").strip()
+    if override:
+        return Path(override)
+    run = cache_dir() / "r20_center_simplify"
+    for local, remote in _SIMPLIFY_MODEL_FILES.items():
+        _ensure(local, remote, run)
+    return run
+
+
 def ensure_default_stock() -> Path:
     """Download the default building-block stock; return its path."""
     return _ensure(_STOCK_FILE, _STOCK_FILE, cache_dir())
@@ -184,6 +205,7 @@ def clear_cache() -> None:
 __all__ = [
     "cache_dir",
     "ensure_default_model",
+    "ensure_simplify_model",
     "ensure_default_stock",
     "ensure_default_plausibility_model",
     "ensure_default_assets",

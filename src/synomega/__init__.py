@@ -27,7 +27,7 @@ Quick start::
 
 from __future__ import annotations
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 from .chem import Molecule, Reaction
 from .planner import Planner
@@ -39,6 +39,7 @@ from .synthesizability import BatchReport, MoleculeReport, SynthesizabilityScore
 
 def load_default_planner(
     *, algorithm: str = "retrostar", device: str = "cpu",
+    simplify: bool = False,
     plausibility: bool = False, plausibility_threshold: float = 0.4,
     **planner_kwargs,
 ) -> "Planner":
@@ -53,6 +54,11 @@ def load_default_planner(
 
     The first call fetches a few hundred MB into ``~/.cache/synomega``.
 
+    Pass ``simplify=True`` to back the planner with the simplification-constrained
+    single-step model (fragmentation-only disconnections), which reaches purchasable
+    material with fewer node expansions at matched solvability; it is downloaded on
+    first use like the default model.
+
     Reaction-plausibility screening of single-step predictions is **off by
     default** (benchmarks show it does not improve top-k retrieval of the recorded
     reaction and adds latency). Pass ``plausibility=True`` to enable it, optionally
@@ -61,7 +67,8 @@ def load_default_planner(
     from .singlestep import TemplateGNN
     from .stock import InMemoryStock
 
-    model = TemplateGNN.default(device=device)
+    model = (TemplateGNN.simplify(device=device) if simplify
+             else TemplateGNN.default(device=device))
     stock = InMemoryStock.default()
     scorer = None
     if plausibility:

@@ -104,6 +104,22 @@ class TemplateGNN(SingleStepModel):
         return cls.from_pretrained(ensure_default_model(), **kwargs)
 
     @classmethod
+    def simplify(cls, **kwargs) -> "TemplateGNN":
+        """Load the simplification-constrained model, downloading it on first use.
+
+        This model proposes only *simplifying* (fragmentation) disconnections --
+        those that split the target into two or more precursors. In multi-step
+        search it reaches purchasable material with fewer node expansions at
+        matched solvability (see the accompanying paper). Convenience for
+        ``from_pretrained(ensure_simplify_model())``; extra keyword args (e.g.
+        ``device``) are forwarded. Override the download with
+        ``SYNOMEGA_SIMPLIFY_MODEL=/path/to/run_dir``.
+        """
+        from ..data import ensure_simplify_model
+
+        return cls.from_pretrained(ensure_simplify_model(), **kwargs)
+
+    @classmethod
     def from_pretrained(
         cls,
         run_dir: str | Path,
