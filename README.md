@@ -121,17 +121,18 @@ threshold are **dropped** — the filter only removes wrong disconnections, it n
 re-ranks the survivors. Because search and synthesizability both expand through
 the single-step model, this screens *every* single-step prediction in the system.
 
-It is **on by default** (threshold `0.4`, calibrated to delete ~0.6% of correct
-disconnections while pruning implausible ones). The model downloads on first use,
-like the default model/stock.
+It is **off by default**: benchmarks (`scripts/BENCHMARKS.md`) show it does not
+improve top-k retrieval of the recorded reaction (it is marginally negative,
+−0.2…−0.9 pp) and adds latency (×1.7 GPU / ×4.6 CPU). Enable it when you want the
+candidate list pruned of implausible disconnections rather than maximal recall.
 
 ```python
-# on by default:
+# off by default:
 planner = synomega.load_default_planner()
 
-# tune or disable:
-planner = synomega.load_default_planner(plausibility_threshold=0.5)
-planner = synomega.load_default_planner(plausibility=False)
+# enable / tune:
+planner = synomega.load_default_planner(plausibility=True)
+planner = synomega.load_default_planner(plausibility=True, plausibility_threshold=0.5)
 
 # bring your own single-step model + explicit scorer:
 from synomega.plausibility import PlausibilityScorer
@@ -139,7 +140,7 @@ scorer = PlausibilityScorer.default(device="cpu")
 planner = Planner(model, stock, plausibility=scorer, plausibility_threshold=0.4)
 ```
 
-Each surviving prediction carries its raw plausibility in
+When enabled, each surviving prediction carries its raw plausibility in
 `prediction.meta["plausibility"]`.
 
 ## Two synthesizability metrics

@@ -27,7 +27,7 @@ Quick start::
 
 from __future__ import annotations
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 from .chem import Molecule, Reaction
 from .planner import Planner
@@ -39,7 +39,7 @@ from .synthesizability import BatchReport, MoleculeReport, SynthesizabilityScore
 
 def load_default_planner(
     *, algorithm: str = "retrostar", device: str = "cpu",
-    plausibility: bool = True, plausibility_threshold: float = 0.4,
+    plausibility: bool = False, plausibility_threshold: float = 0.4,
     **planner_kwargs,
 ) -> "Planner":
     """A ready-to-use planner backed by the default model + stock.
@@ -53,9 +53,10 @@ def load_default_planner(
 
     The first call fetches a few hundred MB into ``~/.cache/synomega``.
 
-    By default every single-step prediction is screened by the dual-tower
-    reaction-plausibility model (``plausibility=True``); pass ``plausibility=False``
-    to disable it, or tune ``plausibility_threshold``.
+    Reaction-plausibility screening of single-step predictions is **off by
+    default** (benchmarks show it does not improve top-k retrieval of the recorded
+    reaction and adds latency). Pass ``plausibility=True`` to enable it, optionally
+    with a ``plausibility_threshold``.
     """
     from .singlestep import TemplateGNN
     from .stock import InMemoryStock

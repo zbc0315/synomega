@@ -5,10 +5,13 @@ For each candidate disconnection ``reactants -> target``, the plausibility model
 scores how likely those reactants really give the target. Candidates below
 ``threshold`` are **dropped**; everything else is left exactly as the single-step
 model ranked it — the filter only removes wrong reactions, it never re-orders the
-survivors. To avoid dead-ending search when nothing clears the bar, the single-
-step model's own top ``min_keep`` candidates are retained. The raw plausibility is
-recorded in ``prediction.meta["plausibility"]`` and each prediction's ``score`` is
-left untouched.
+survivors. ``top_k`` is an upper bound (a search's expansion width), not a quota:
+the filter screens the model's own top-``top_k`` and returns however many survive
+— search only needs *at least one*, guaranteed by keeping the model's top
+``min_keep`` when nothing clears the bar. It does not fetch extra candidates to
+backfill dropped ones (that would just reintroduce lower-confidence disconnections
+to hit a count). The raw plausibility is recorded in
+``prediction.meta["plausibility"]`` and each prediction's ``score`` is left untouched.
 
 Because search and synthesizability both expand nodes through the single-step
 model, wrapping it here screens *every* single-step prediction in the system.
@@ -23,11 +26,14 @@ from ..singlestep.base import Prediction, SingleStepModel
 
 class PlausibilityFilteredModel(SingleStepModel):
     def __init__(self, base: SingleStepModel, scorer, *, threshold: float = 0.4,
-                 min_keep: int = 1, overfetch: int = 2):
+                 min_keep: int = 1, overfetch: int = 1):
         self.base = base
         self.scorer = scorer
         self.threshold = threshold
         self.min_keep = min_keep
+        # top_k is a cap, not a quota: fetch exactly top_k and keep whatever
+        # survives (>=1). overfetch>1 backfills dropped slots with weaker
+        # candidates to hit a count — off by default.
         self.overfetch = max(1, overfetch)
         self.name = f"{base.name}+plausibility"
 
@@ -35,7 +41,8 @@ class PlausibilityFilteredModel(SingleStepModel):
         return self.predict_batch([smiles], top_k)[0]
 
     def predict_batch(self, smiles, top_k: int = 50):
-        # Over-fetch so filtering still leaves ~top_k plausible candidates.
+        # Screen the model's own top-top_k; keep survivors (>=1). overfetch is 1
+        # by default (no backfilling — top_k is a cap, not a quota).
         base = self.base.predict_batch(smiles, top_k * self.overfetch)
 
         # Flatten every (candidate, target) into ONE plausibility batch.
