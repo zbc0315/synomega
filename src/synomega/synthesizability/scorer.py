@@ -96,9 +96,14 @@ class SynthesizabilityScorer:
             min_steps = best.num_steps
             min_route_depth = best.depth
         elif routes:
-            # Unsolved: report the best partial route's coverage so a near-miss
-            # is distinguishable from a total failure.
-            best = max(routes, key=lambda r: r.bb_coverage)
+            # Unsolved: the best partial route is the one that maximizes the
+            # SynOmega score, i.e. has the fewest non-purchasable leaves U (ties
+            # broken toward higher coverage, then fewer reactions), so the reported
+            # route is the one the score refers to.
+            def _n_unpurchasable(r: Route) -> int:
+                return sum(1 for leaf in r.leaves if not leaf.in_stock)
+
+            best = min(routes, key=lambda r: (_n_unpurchasable(r), -r.bb_coverage, r.num_steps))
             coverage = best.bb_coverage
             min_steps = min_route_depth = None
         else:

@@ -43,14 +43,14 @@ Disconnections to Simplifying Reactions for Efficient Synthesizability Scoring"*
   0.57->0.32 s.**
 
 ### `aizynth_comparison/` — SynOmega vs AiZynthFinder, all 1000 targets (Results; Fig. 3c,d)
-- `aizynth_out.json.gz` — AiZynthFinder (v4.4.1) on all 1000 targets, **depth/width/
-  iteration budget aligned to SynOmega** (cutoff_number=10, max_transforms=5,
-  iteration_limit=100; config `../target_set/aizynth_config_aligned.yml`).
+- `aizynth_out.json.gz` — AiZynthFinder (v4.4.1) on all 1000 targets, **on the same
+  GPU as SynOmega** and with **depth/width/iteration budget aligned** (cutoff_number=10,
+  max_transforms=5, iteration_limit=100; config `../target_set/aizynth_config_aligned.yml`).
 - `compare_aizynth.py` — matches targets by canonical SMILES and reproduces every
   AiZynthFinder-comparison number: solved rate, per-target agreement, search-time.
-- `aizynth_comparison_results.md` — **solved 46.5% (AiZynth) vs 81.8/85.1%
-  (SynOmega) ~1.8x; median search 4.11 s vs 0.32 s (simplify) ~13x / 0.57 s (full)
-  ~7x; agreement both 458 / SynOmega-only 393 / AiZynth-only 7 / neither 142.**
+- `aizynth_comparison_results.md` — **solved 46.7% (AiZynth) vs 81.8/85.1%
+  (SynOmega) ~1.8x; median search 4.1 s vs 0.32 s (simplify) ~13x / 0.49 s (full)
+  ~8x; agreement both 460 / SynOmega-only 391 / AiZynth-only 7 / neither 142.**
   Node/iteration counts are not compared across the two search formulations.
   These feed Figure 3 (c: solved rate; d: agreement).
 
