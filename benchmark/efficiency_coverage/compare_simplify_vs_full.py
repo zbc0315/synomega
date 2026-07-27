@@ -57,7 +57,8 @@ def main():
     t0 = time.time()
     with open(args.out, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["smiles", "solved", "bb_coverage", "min_steps",
+        w.writerow(["smiles", "solved", "bb_coverage", "num_leaves",
+                    "num_purchasable", "u", "synscore", "min_steps",
                     "min_route_depth", "expansions", "sec", "status"])
         for i, smi in enumerate(smis, 1):
             ts = time.time()
@@ -66,15 +67,17 @@ def main():
                 r = scorer.score(smi, max_steps=args.max_steps)
                 signal.alarm(0)
                 w.writerow([smi, int(bool(r.solved)), round(float(r.bb_coverage), 4),
+                            r.num_leaves, r.num_purchasable_leaves,
+                            r.num_unpurchasable_leaves, round(float(r.score), 6),
                             getattr(r, "min_steps", "") or "",
                             getattr(r, "min_route_depth", "") or "",
                             getattr(r, "expansions", ""), round(time.time() - ts, 2), "ok"])
             except _Timeout:
-                w.writerow([smi, "", "", "", "", "", round(time.time() - ts, 2), "TIMEOUT"])
+                w.writerow([smi, "", "", "", "", "", "", "", "", "", round(time.time() - ts, 2), "TIMEOUT"])
             except Exception as e:
                 signal.alarm(0)
-                w.writerow([smi, "", "", "", "", "", round(time.time() - ts, 2),
-                            "ERR:" + type(e).__name__])
+                w.writerow([smi, "", "", "", "", "", "", "", "", "",
+                            round(time.time() - ts, 2), "ERR:" + type(e).__name__])
             if i % 25 == 0:
                 f.flush()
                 print(f"  {i}/{len(smis)}  ({(time.time()-t0)/i:.1f}s/mol avg)", flush=True)

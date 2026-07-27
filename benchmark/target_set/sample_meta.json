@@ -1,0 +1,16 @@
+{
+  "source": "ChEMBL 35 (compound_structures, molecule_type='Small molecule')",
+  "seed": 20260727,
+  "n_targets_requested": 1000,
+  "n_targets_obtained": 1000,
+  "subset": 200,
+  "eligible_pool": 1915466,
+  "n_drawn": 1017,
+  "n_unparseable": 0,
+  "n_size_filtered": 17,
+  "n_duplicate_inchikey": 0,
+  "min_heavy_atoms": 5,
+  "max_heavy_atoms": 60,
+  "fragment_rule": "largest organic fragment (salt stripping)",
+  "dedup": "by InChIKey"
+}

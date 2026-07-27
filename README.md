@@ -170,11 +170,16 @@ answer different questions.
 |---|---|---|
 | `solved@N` / `solve_rate` | **Binary** — does a route of depth ≤ N exist whose leaves are *all* purchasable? | Comparing against published numbers |
 | `bb_coverage@N` | **Continuous** — fraction of the best route's leaves that are purchasable | Ranking molecules by how close they are |
+| `score` | **Continuous** — `1/(U+1)**U` where `U` = number of non-purchasable starting materials (U=0 → 1.0, 1 → 0.5, 2 → 0.11; no route → 0) | Ranking with a sharp solved / few-missing / many-missing separation |
 
 `bb_coverage` matters because most targets are unsolved at realistic step limits.
 A 5-step route with 4 of 5 leaves buyable scores 0.8, not 0 — so a near-miss is
 distinguishable from a total failure, and a set of molecules can be *ranked*
-rather than merely split into solved/unsolved.
+rather than merely split into solved/unsolved. The headline **`score`** =
+`1/(U+1)**U`, where `U` is the number of non-purchasable starting materials in the
+best route, falls off sharply with each missing building block (U=0 → 1.0, 1 → 0.5,
+2 → 0.11, 3 → 0.016), so it cleanly separates a solved target, one missing a few
+materials, and one missing many.
 
 ## Search algorithms
 

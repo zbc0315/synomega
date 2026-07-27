@@ -1,0 +1,19 @@
+# AiZynthFinder config with search depth/width aligned to SynOmega's budget:
+#   cutoff_number = 10   (expansion width; matches SynOmega top-10)
+#   max_transforms = 5   (search depth; matches SynOmega depth <= 5)
+#   iteration_limit = 100 (search-effort cap; matches SynOmega <= 100 expansions)
+# USPTO expansion policy + USPTO filter + ZINC stock (same building blocks as SynOmega).
+expansion:
+  uspto:
+    type: template-based
+    model: /home/zbc/Projects/solvent-friendly-retrosyn/aizynth_data/uspto_model.onnx
+    template: /home/zbc/Projects/solvent-friendly-retrosyn/aizynth_data/uspto_templates.csv.gz
+    cutoff_number: 10
+filter:
+  uspto: /home/zbc/Projects/solvent-friendly-retrosyn/aizynth_data/uspto_filter_model.onnx
+stock:
+  zinc: /home/zbc/Projects/solvent-friendly-retrosyn/aizynth_data/zinc_stock.hdf5
+search:
+  max_transforms: 5
+  iteration_limit: 100
+  time_limit: 120

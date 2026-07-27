@@ -9,7 +9,18 @@ Disconnections to Simplifying Reactions for Efficient Synthesizability Scoring"*
 > Large artifacts (trained models, featurized shards, the reaction corpus) are **not**
 > included here; the corpus is from a commercial database and is not redistributed.
 
+> Target set (2026-07-27): all benchmarks use **1000 drug molecules randomly sampled
+> from ChEMBL 35** (seed 20260727; out-of-distribution from the training reactions).
+> Sampling + run drivers + analysis in `target_set/`. **All experiments use the
+> full 1000** (the 200-subset runs are deprecated).
+
 ## Layout & mapping to the paper
+
+### `target_set/` — the ChEMBL benchmark targets (Methods; SI S3)
+- `sample_chembl.py` — reproducible seeded sampler (ChEMBL small molecules, largest
+  organic fragment, 5-60 heavy atoms, InChIKey dedup) -> `targets.smi` + `sample_meta.json`.
+- `run_synomega_chembl.sh` / `run_aizynth_chembl.sh` — server drivers (8s/100exp/k10).
+- `analyze_chembl.py` — one-shot efficiency + correlation + AiZynth analysis.
 
 ### `simplify_model/` — the simplifying-template filter (Methods; Fig. 2)
 - `build_simplify_filter.py` — filters the 64,366 radius-0 templates to the
@@ -21,37 +32,55 @@ Disconnections to Simplifying Reactions for Efficient Synthesizability Scoring"*
 - `r20_center_simplify.yaml` — training config for the constrained "simplify"
   model (warm-started from the full r20_center encoder). Best val top-1 = 0.575.
 
-### `efficiency_coverage/` — simplify vs full, matched budget (Results; Table 1, Fig. 3)
+### `efficiency_coverage/` — simplify vs full, matched budget (Results; Table 1, Fig. 3a,b)
 - `compare_simplify_vs_full.py` — per-molecule scorer with a hard wall-clock cap.
-- `subset200.smi` — the 200 drug-like targets.
-- `full.csv`, `simplify.csv` — per-molecule results (solved, bb_coverage,
-  min_steps, min_route_depth, expansions, sec, status).
-- `simplify_comparison_results.md` — analysis (top-10 budget): **-30% expansions on
-  127 solved-by-both (28.3->19.7), 53 vs 24 per-molecule; solved 72.5% (full) vs
-  72.0% (simplify); unique 18 vs 17; mean bb-coverage 0.865 vs 0.822; median time
-  1.27->0.59 s.** External baseline AiZynthFinder: 36.5% on the same set.
+- `full.csv`, `simplify.csv` — per-molecule results on all 1000 targets (solved,
+  bb_coverage, min_steps, min_route_depth, expansions, sec, status).
+- `paired_stats.py` — Wilcoxon signed-rank on paired solved-by-both expansions.
+- `simplify_comparison_results.md` — **-28% expansions on 783 solved-by-both
+  (22.0->15.7), Wilcoxon p=4e-21; solved 81.8% (full) vs 85.1% (simplify), +3.3pp
+  McNemar p=0.001; unique 35 vs 68; mean bb-coverage 0.919 both; median time
+  0.57->0.32 s.**
 
-### `synthesizability_baselines/` — SynOmega vs SAscore/SCScore/RAscore (Results; Table 2, Fig. 4, Cost)
+### `aizynth_comparison/` — SynOmega vs AiZynthFinder, all 1000 targets (Results; Fig. 3c,d)
+- `aizynth_out.json.gz` — AiZynthFinder (v4.4.1) on all 1000 targets, **depth/width/
+  iteration budget aligned to SynOmega** (cutoff_number=10, max_transforms=5,
+  iteration_limit=100; config `../target_set/aizynth_config_aligned.yml`).
+- `compare_aizynth.py` — matches targets by canonical SMILES and reproduces every
+  AiZynthFinder-comparison number: solved rate, per-target agreement, search-time.
+- `aizynth_comparison_results.md` — **solved 46.5% (AiZynth) vs 81.8/85.1%
+  (SynOmega) ~1.8x; median search 4.11 s vs 0.32 s (simplify) ~13x / 0.57 s (full)
+  ~7x; agreement both 458 / SynOmega-only 393 / AiZynth-only 7 / neither 142.**
+  Node/iteration counts are not compared across the two search formulations.
+  These feed Figure 3 (c: solved rate; d: agreement).
+
+### `synthesizability_baselines/` — SynOmega vs SAscore/SCScore/RAscore (Results; Table 2, Cost)
 - `score_synomega.py` — bb-coverage / solved@N over the 1000 targets (per-mol `sec`).
 - `score_baselines.py` — SAscore + SCScore (per-mol `sa_sec`/`sc_sec`).
 - `score_rascore.py` — RAscore XGB (per-mol `ra_sec`; env needs numpy<2 +
   xgboost==1.2.1 + scikit-learn==1.0.2 to load the official pickle).
-- `analyze_scores.py` — three-way Spearman + solved@5=0 subset analysis.
-- `run_syn_shards.sh` — 8-shard parallel scoring driver.
-- `*.csv` — `syn_targets` (bb_coverage/solved), `base_targets` (SA/SC),
-  `rascore_targets` (RA), `syn_targets_timing` (clean single-process timing, n=150).
-- `synth_eval_results.md` — **full-set rho: SA -0.522 / RA +0.518 / SC -0.209;
-  solved@5=0 subset (n=234): bb-coverage s.d. 0.278, SA -0.387, RA +0.363;
-  cost: median 1.25 s vs sub-25 ms scalar predictors.**
+- `bootstrap_ci.py` — three-way Spearman + 95% bootstrap CI (Table 2).
+- `analyze_scores.py` — legacy three-way Spearman (the solved@5=0 breakdown it also
+  prints is retained for reference but is **no longer in the manuscript**).
+- `*.csv` — `syn_targets` (= full.csv, bb_coverage/solved), `base_targets` (SA/SC),
+  `rascore_targets` (RA).
+- `synth_eval_results.md` — **rho: SA -0.536 [-0.576,-0.492] / RA +0.503
+  [+0.459,+0.544] / SC -0.208 [-0.265,-0.150]; cost median 0.57 s vs sub-ms/tens-ms
+  scalar predictors.**
 
-### `figures/`
-- `fig1_pipeline.png`, `fig2_templates.png`, `fig3_efficiency.png`,
-  `fig4_bbcoverage.png` — the four manuscript figures.
-- `paper_chem_syn_*.py` — the generation scripts (read the CSVs above).
+### Figures
+The four manuscript figures and their generation scripts live with the manuscript
+source in `retrosyn/paper_chem_syn/figures/` (e.g. `make_results_fig.py`, which
+reads the `efficiency_coverage/` and `aizynth_comparison/` data), not here. Fig. 3
+is a single 2x2 figure: (a,b) simplify vs full, (c,d) vs AiZynthFinder.
 
 ## Reproduce
-1. Filter templates + train the simplify model: `simplify_model/`.
-2. Efficiency-coverage comparison: `efficiency_coverage/compare_simplify_vs_full.py`
-   on `subset200.smi`, once per model (full / simplify), then the analysis in the md.
-3. Synthesizability baselines: run the three `score_*.py` on the 1000-target set,
-   then `analyze_scores.py`.
+1. Sample targets: `target_set/sample_chembl.py` -> `targets.smi` (seed 20260727).
+2. Filter templates + train the simplify model: `simplify_model/`.
+3. Efficiency-coverage: `efficiency_coverage/compare_simplify_vs_full.py` on
+   `targets.smi`, once per model (full=run_r20 / simplify=run_simplify), then
+   `paired_stats.py`.
+4. Synthesizability baselines: the three `score_*.py` on the 1000 targets, then
+   `synthesizability_baselines/bootstrap_ci.py`.
+5. AiZynthFinder: `target_set/run_aizynth_chembl.sh` (all 1000, depth/width/budget
+   aligned via `aizynth_config_aligned.yml`), then `aizynth_comparison/compare_aizynth.py`.

@@ -49,10 +49,30 @@ class MoleculeReport:
     def num_leaves(self) -> int:
         return len(self.leaves)
 
+    @property
+    def num_unpurchasable_leaves(self) -> int:
+        """U: starting materials of the best route that are not purchasable."""
+        return self.num_leaves - self.num_purchasable_leaves
+
+    @property
+    def score(self) -> float:
+        """SynOmega synthesizability score, based on the count U of non-purchasable
+        starting materials in the best route: ``score = 1 / (U + 1) ** U``. So a
+        solved target (U=0) scores 1.0, and the score falls off sharply as more
+        building blocks are unavailable: U=1 -> 0.5, U=2 -> ~0.11, U=3 -> ~0.016.
+        This separates a solved target, one with a few unavailable materials, and
+        one with many, far more sharply than a coverage fraction. A target for
+        which no route is found at all scores 0."""
+        if not self.solved and self.num_leaves == 0:
+            return 0.0
+        u = self.num_unpurchasable_leaves
+        return 1.0 / (u + 1) ** u
+
     def as_dict(self) -> dict:
         return {
             "smiles": self.smiles,
             "solved": self.solved,
+            "score": round(self.score, 4),
             "bb_coverage": round(self.bb_coverage, 4),
             "min_steps": self.min_steps,
             "min_route_depth": self.min_route_depth,

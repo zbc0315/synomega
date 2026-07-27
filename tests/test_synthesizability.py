@@ -151,3 +151,18 @@ def test_solve_rate_at_depth():
     assert batch.solve_rate_at(1) == 0.5      # only A is a 1-step route
     assert batch.solve_rate_at(4) == 1.0
     assert batch.depth_histogram == {1: 1, 4: 1}
+
+
+def test_score_is_synscore_of_unpurchasable_count():
+    # SynScore = 1/(U+1)**U, U = non-purchasable leaves of the best route.
+    solved = MoleculeReport("A", True, 1.0, 1, 1, 1,
+                            leaves=[("x", True), ("y", True)])
+    one = MoleculeReport("B", False, 0.5, None, None, 0,
+                         leaves=[("x", True), ("y", False)])
+    two = MoleculeReport("C", False, 0.33, None, None, 0,
+                         leaves=[("x", False), ("y", False), ("z", True)])
+    no_route = MoleculeReport("D", False, 0.0, None, None, 0, leaves=[])
+    assert solved.num_unpurchasable_leaves == 0 and solved.score == 1.0
+    assert one.score == 0.5
+    assert abs(two.score - 1.0 / 9.0) < 1e-9
+    assert no_route.score == 0.0
