@@ -43,8 +43,11 @@ import synomega
 planner = synomega.load_default_planner()          # downloads model + stock once
 print(planner.plan("CC(=O)Nc1ccccc1O").best_route.describe())
 
-from synomega import SynthesizabilityScorer
-score = SynthesizabilityScorer(planner).score("CC(=O)Nc1ccccc1O", max_steps=5)
+# Synthesizability scoring uses the simplification-constrained ("breaking")
+# single-step model by default -- the recommended model for scoring -- at the
+# k=10 expansion-width operating point.
+scorer = synomega.load_default_scorer()            # simplify=True, k=10 by default
+score = scorer.score("CC(=O)Nc1ccccc1O", max_steps=5)
 print(score.bb_coverage, score.min_steps)
 ```
 
@@ -159,7 +162,10 @@ from synomega.singlestep import TemplateGNN
 model = TemplateGNN.simplify(device="cpu")               # or load it directly
 ```
 
-Override the download with `SYNOMEGA_SIMPLIFY_MODEL=/path/to/run_dir`.
+This is the default model for synthesizability scoring: `synomega.load_default_scorer()`
+uses it out of the box (pass `simplify=False` to score with the unconstrained model),
+and the `synomega score` CLI defaults to it too (`--original` reverts). Override the
+download with `SYNOMEGA_SIMPLIFY_MODEL=/path/to/run_dir`.
 
 ## Two synthesizability metrics
 

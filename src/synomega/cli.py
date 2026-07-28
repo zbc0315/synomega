@@ -25,8 +25,15 @@ def _load_stock(path: str, keys: bool):
 def _load_model(args):
     from .singlestep import TemplateGNN
 
-    # No --model given: download and use the default pretrained model.
+    # No --model given: download and use a default pretrained model. `score`
+    # defaults to the simplification-constrained ("breaking") model; `plan`
+    # defaults to the unconstrained ("original") one (see `simplify` default set
+    # per-subcommand in `build_parser`).
     if not getattr(args, "model", None):
+        if getattr(args, "simplify", False):
+            return TemplateGNN.simplify(
+                device=args.device, topk_templates=args.expansion_width
+            )
         return TemplateGNN.default(
             device=args.device, topk_templates=args.expansion_width
         )
@@ -120,7 +127,7 @@ def cmd_build_stock(args) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="synomega", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="command", required=True)
@@ -153,12 +160,21 @@ def main(argv: list[str] | None = None) -> int:
     sp_plan = sub.add_parser("plan", help="find routes to one target")
     sp_plan.add_argument("--target", required=True)
     add_common(sp_plan)
-    sp_plan.set_defaults(func=cmd_plan)
+    # `plan` defaults to the unconstrained ("original") model; --simplify opts in
+    # to the fragmentation-only ("breaking") model (only used when no --model given).
+    sp_plan.add_argument("--simplify", dest="simplify", action="store_true",
+                         help="use the simplification-constrained (breaking) model")
+    sp_plan.set_defaults(func=cmd_plan, simplify=False)
 
     sp_score = sub.add_parser("score", help="synthesizability over a target list")
     sp_score.add_argument("--targets", required=True, help="one SMILES per line")
     add_common(sp_score)
-    sp_score.set_defaults(func=cmd_score)
+    # `score` defaults to the fragmentation-only ("breaking") model, the recommended
+    # model for synthesizability scoring; --original reverts to the unconstrained one
+    # (only used when no --model given).
+    sp_score.add_argument("--original", dest="simplify", action="store_false",
+                          help="score with the unconstrained (original) model instead")
+    sp_score.set_defaults(func=cmd_score, simplify=True)
 
     sub.add_parser(
         "download",
@@ -171,7 +187,11 @@ def main(argv: list[str] | None = None) -> int:
     sp_stock.add_argument("--out", required=True)
     sp_stock.set_defaults(func=cmd_build_stock)
 
-    args = p.parse_args(argv)
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
     return args.func(args)
 
 

@@ -166,3 +166,45 @@ def test_score_is_synscore_of_unpurchasable_count():
     assert one.score == 0.5
     assert abs(two.score - 1.0 / 9.0) < 1e-9
     assert no_route.score == 0.0
+
+
+# ----------------------------------------------------------- default loaders
+
+
+def test_load_default_scorer_defaults_to_breaking(monkeypatch):
+    """`load_default_scorer` must back the scorer with the breaking model by
+    default (simplify=True), and honor an explicit override."""
+    import synomega
+
+    captured = {}
+
+    class _FakePlanner:
+        pass
+
+    def _fake_load_default_planner(**kwargs):
+        captured.clear()
+        captured.update(kwargs)
+        return _FakePlanner()
+
+    monkeypatch.setattr(synomega, "load_default_planner", _fake_load_default_planner)
+
+    scorer = synomega.load_default_scorer()
+    assert isinstance(scorer, synomega.SynthesizabilityScorer)
+    assert captured["simplify"] is True            # breaking by default
+    assert captured["expansion_width"] == 10       # k=10 operating point by default
+
+    synomega.load_default_scorer(simplify=False, expansion_width=25)
+    assert captured["simplify"] is False           # explicit override respected
+    assert captured["expansion_width"] == 25
+
+
+def test_cli_score_defaults_to_breaking_plan_to_original():
+    """The `score` subcommand defaults to the breaking model, `plan` to original."""
+    from synomega.cli import build_parser
+
+    p = build_parser()
+    assert p.parse_args(["score", "--targets", "x.smi"]).simplify is True
+    assert p.parse_args(["plan", "--target", "CCO"]).simplify is False
+    # explicit flags flip the default
+    assert p.parse_args(["score", "--targets", "x.smi", "--original"]).simplify is False
+    assert p.parse_args(["plan", "--target", "CCO", "--simplify"]).simplify is True

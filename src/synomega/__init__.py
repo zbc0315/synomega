@@ -27,7 +27,7 @@ Quick start::
 
 from __future__ import annotations
 
-__version__ = "0.6.1"
+__version__ = "0.7.0"
 
 from .chem import Molecule, Reaction
 from .planner import Planner
@@ -79,10 +79,47 @@ def load_default_planner(
                    plausibility_threshold=plausibility_threshold, **planner_kwargs)
 
 
+def load_default_scorer(
+    *, algorithm: str = "retrostar", device: str = "cpu",
+    simplify: bool = True, expansion_width: int = 10,
+    plausibility: bool = False, plausibility_threshold: float = 0.4,
+    **planner_kwargs,
+) -> "SynthesizabilityScorer":
+    """A ready-to-use synthesizability scorer backed by the default model + stock.
+
+    Downloads the model and building-block stock on first use, so scoring works
+    out of the box::
+
+        import synomega
+        scorer = synomega.load_default_scorer()
+        print(scorer.score("CC(=O)Nc1ccccc1O").as_dict())
+
+    Unlike :func:`load_default_planner`, this defaults to the
+    simplification-constrained (``breaking``) single-step model
+    (``simplify=True``): restricting single-step predictions to simplifying
+    (fragmentation) disconnections reaches purchasable building blocks with fewer
+    node expansions at matched solvability, which makes it the recommended model
+    for route-based synthesizability scoring. Pass ``simplify=False`` to score with
+    the unconstrained (``original``) model instead.
+
+    Scoring also defaults to an expansion width of ``k=10`` -- the operating point
+    at which the breaking model is near-converged yet inexpensive (see the
+    accompanying paper), rather than the planner's wider default of 50.
+    """
+    planner = load_default_planner(
+        algorithm=algorithm, device=device, simplify=simplify,
+        expansion_width=expansion_width,
+        plausibility=plausibility, plausibility_threshold=plausibility_threshold,
+        **planner_kwargs,
+    )
+    return SynthesizabilityScorer(planner)
+
+
 __all__ = [
     "__version__",
     "Planner",
     "load_default_planner",
+    "load_default_scorer",
     "SynthesizabilityScorer",
     "MoleculeReport",
     "BatchReport",
