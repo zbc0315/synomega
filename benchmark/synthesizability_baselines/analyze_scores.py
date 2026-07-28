@@ -33,7 +33,7 @@ def main():
 
     # higher bb_coverage/rascore = easier; higher SA/SC = harder -> expect negative corr
     scores = ["sascore", "scscore"] + (["rascore"] if "rascore" in df.columns else [])
-    print("\n=== Spearman correlation (full set) ===")
+    print("\n=== Spearman correlation (entire set) ===")
     print(f"{'pair':28} rho      p")
     pairs = [("bb_coverage", s) for s in scores] + \
             [("solved", s) for s in scores] + \

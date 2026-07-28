@@ -141,7 +141,7 @@ def main():
         "n_test": counts.get("test", 0),
         "source": str(src),
         "filter": str(fdir),
-        "note": "simplification (fragmentation) templates only",
+        "note": "simplifying templates only",
     }
     (out / "meta.json").write_text(json.dumps(meta, indent=2))
     # carry the label maps alongside the featurized data

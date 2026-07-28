@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""k-sweep analysis: full model @ expansion width 50 is the per-molecule gold
-standard; the simplify model is evaluated at k = 3..10. For each k we report the
-efficiency (mean expansions, median wall-clock) and the scoring accuracy relative
-to the gold (bb-coverage MAE/RMSE, Spearman/Pearson, and solved@5 agreement).
+"""k-sweep analysis: the original model @ expansion width 50 is the per-molecule
+gold standard; the simplify model is evaluated at k = 3..10. For each k we report
+the efficiency (mean expansions, median wall-clock) and the scoring accuracy relative
+to the gold (bb-coverage MAE/RMSE, Spearman/Pearson, and solved agreement).
 
-Reads gold_full_k50.csv and simplify_k03.csv..simplify_k10.csv in this directory
+Reads gold_original_k50.csv and simplify_k03.csv..simplify_k10.csv in this directory
 (pulled from the server run). Per-molecule scores/times are kept in those CSVs for
 deeper analysis. Run: python ksweep_analyze.py
 """
@@ -33,7 +33,7 @@ def solved(r):
 
 
 def sweep_table(title, prefix, gold, gkeys):
-    print(f"\n=== {title} (accuracy vs gold = full@k=50) ===")
+    print(f"\n=== {title} (accuracy vs gold = original @ k=50) ===")
     print(f"{'k':>3} {'mean_exp':>9} {'med_time':>9} {'solved%':>8} "
           f"{'MAE':>7} {'RMSE':>7} {'Spearman':>9} {'Pearson':>8} {'solve_agree':>11}")
     for k in range(3, 11):
@@ -59,16 +59,16 @@ def sweep_table(title, prefix, gold, gkeys):
 
 
 def main():
-    gold = load("gold_full_k50.csv")
+    gold = load("gold_original_k50.csv")
     gkeys = [k for k in gold if num(gold[k]["bb_coverage"]) is not None]
     ge = [num(gold[x]["expansions"]) for x in gkeys if num(gold[x]["expansions"]) is not None]
     gt = [num(gold[x]["sec"]) for x in gkeys if num(gold[x]["sec"]) is not None]
     gsolved = 100 * sum(solved(gold[x]) for x in gkeys) / len(gkeys)
-    print(f"gold = full model @ k=50, n={len(gkeys)} scored | "
+    print(f"gold = original model @ k=50, n={len(gkeys)} scored | "
           f"mean_exp {st.mean(ge):.1f}  med_time {st.median(gt):.3f}s  solved {gsolved:.1f}%")
 
     sweep_table("SIMPLIFY sweep", "simplify", gold, gkeys)
-    sweep_table("FULL sweep", "full", gold, gkeys)
+    sweep_table("ORIGINAL sweep", "original", gold, gkeys)
 
 
 if __name__ == "__main__":

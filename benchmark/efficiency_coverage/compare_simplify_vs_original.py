@@ -1,17 +1,18 @@
-"""Efficiency vs coverage comparison for the simplification-constrained single-step
-model against the full model, on the SAME target set with the SAME search budget.
+"""Efficiency vs coverage comparison for the simplifying-template constrained
+single-step model against the original model, on the SAME target set with the SAME
+search budget.
 
 Per molecule (via SynthesizabilityScorer.score): solved, bb_coverage, min_steps,
 min_route_depth (LLS), expansions, wall-clock sec, terminated status. A hard
 per-molecule wall-clock cap (SIGALRM) bounds retro*'s occasional failure to honour
 time_limit on pathological targets; capped molecules are recorded status=TIMEOUT.
 
-Run once per model (full=run_r20, simplify=run_simplify) on the same --smiles,
+Run once per model (original=run_r20, simplify=run_simplify) on the same --smiles,
 then diff the two CSVs.
 
 Usage:
-    python compare_simplify_vs_full.py --run-dir <dir> --stock <keys> \
-        --smiles subset.smi --out full.csv \
+    python compare_simplify_vs_original.py --run-dir <dir> --stock <keys> \
+        --smiles subset.smi --out original.csv \
         --time-limit 8 --max-expansions 100 --hard-timeout 60 --device cuda:0
 """
 import argparse, csv, signal, time

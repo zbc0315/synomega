@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Wilcoxon signed-rank test on paired node expansions, simplify vs full.
+"""Wilcoxon signed-rank test on paired node expansions, simplify vs original.
 
 On the targets solved by BOTH models, is the per-target reduction in node
-expansions under the simplification constraint statistically significant?
+expansions under the simplifying constraint statistically significant?
 Pairs by canonical SMILES. Run: python paired_stats.py
 """
 import csv
@@ -24,30 +24,30 @@ def load(name):
 
 
 def main():
-    full = load("full.csv")
+    orig = load("original.csv")
     simp = load("simplify.csv")
-    solved_both = [k for k in full
+    solved_both = [k for k in orig
                    if k in simp
-                   and full[k]["solved"] in ("True", "1", "true")
+                   and orig[k]["solved"] in ("True", "1", "true")
                    and simp[k]["solved"] in ("True", "1", "true")]
-    f_exp = [float(full[k]["expansions"]) for k in solved_both]
+    o_exp = [float(orig[k]["expansions"]) for k in solved_both]
     s_exp = [float(simp[k]["expansions"]) for k in solved_both]
     n = len(solved_both)
-    mean_f = sum(f_exp) / n
+    mean_o = sum(o_exp) / n
     mean_s = sum(s_exp) / n
-    fewer = sum(s < f for s, f in zip(s_exp, f_exp))
-    more = sum(s > f for s, f in zip(s_exp, f_exp))
+    fewer = sum(s < o for s, o in zip(s_exp, o_exp))
+    more = sum(s > o for s, o in zip(s_exp, o_exp))
     tie = n - fewer - more
 
-    stat, p = wilcoxon(f_exp, s_exp)  # two-sided; H0: no shift
-    stat_g, p_g = wilcoxon(f_exp, s_exp, alternative="greater")  # full > simplify
+    stat, p = wilcoxon(o_exp, s_exp)  # two-sided; H0: no shift
+    stat_g, p_g = wilcoxon(o_exp, s_exp, alternative="greater")  # original > simplify
 
     print(f"Paired on solved-by-both targets: n = {n}")
-    print(f"  mean expansions  full {mean_f:.1f}  simplify {mean_s:.1f}  "
-          f"({100 * (mean_f - mean_s) / mean_f:.0f}% fewer)")
+    print(f"  mean expansions  original {mean_o:.1f}  simplify {mean_s:.1f}  "
+          f"({100 * (mean_o - mean_s) / mean_o:.0f}% fewer)")
     print(f"  per-target: simplify fewer on {fewer}, more on {more}, tie {tie}")
     print(f"  Wilcoxon signed-rank (two-sided):  W={stat:.0f}  p={p:.2e}")
-    print(f"  Wilcoxon (one-sided, full > simplify): W={stat_g:.0f}  p={p_g:.2e}")
+    print(f"  Wilcoxon (one-sided, original > simplify): W={stat_g:.0f}  p={p_g:.2e}")
 
 
 if __name__ == "__main__":

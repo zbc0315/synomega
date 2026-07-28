@@ -5,8 +5,8 @@ set. AiZynthFinder (v4.4.1): public USPTO expansion policy + USPTO filter + ZINC
 stock, on the **same GPU as SynOmega** and with its **search depth, width and iteration budget aligned to SynOmega**:
 `cutoff_number=10` (top-10 templates per expansion), `max_transforms=5` (depth),
 `iteration_limit=100`. Config: `../target_set/aizynth_config_aligned.yml`. SynOmega
-`full` / `simplify` numbers from `../efficiency_coverage/`. Regenerate:
-`python compare_aizynth.py`.
+`original` / `simplify` numbers from `../efficiency_coverage/`. Regenerate:
+`python compare_aizynth.py`. This is **Figure 4** in the manuscript.
 
 With depth/width/budget matched, the remaining differences are the single-step model
 (commercial corpus vs USPTO policy) and the search algorithm (retro* vs MCTS);
@@ -17,7 +17,7 @@ hardware is matched (both on GPU).
 | Planner | Solved / 1000 | Rate |
 |---|---|---|
 | AiZynthFinder | 467 | 46.7% |
-| SynOmega (full) | 818 | 81.8% |
+| SynOmega (original) | 818 | 81.8% |
 | SynOmega (simplify) | 851 | 85.1% |
 
 SynOmega reaches roughly **1.8x** AiZynthFinder's solved rate.
@@ -27,10 +27,10 @@ SynOmega reaches roughly **1.8x** AiZynthFinder's solved rate.
 | Planner | Median (s) |
 |---|---|
 | AiZynthFinder | 4.07 |
-| SynOmega (full) | 0.49 |
+| SynOmega (original) | 0.49 |
 | SynOmega (simplify) | 0.32 |
 
-AiZynthFinder's median is **~13x** the simplify model and **~8x** the full model.
+AiZynthFinder's median is **~13x** the simplify model and **~8x** the original model.
 Node/iteration counts are not compared across the two search formulations.
 
 ## Per-target agreement: SynOmega (simplify) vs AiZynthFinder
@@ -42,5 +42,6 @@ Node/iteration counts are not compared across the two search formulations.
 | AiZynthFinder only | 7 |
 | Neither | 142 |
 
-391 targets solved only by SynOmega vs 7 only by AiZynthFinder. These are panel (d)
-of the merged results figure (Fig. 3); the solved-rate bars are panel (c).
+391 targets solved only by SynOmega vs 7 only by AiZynthFinder. These populate
+**Figure 4** (SynOmega vs AiZynthFinder): the solved-rate bars and the per-target
+agreement breakdown.

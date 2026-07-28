@@ -1,4 +1,4 @@
-# Simplification retrosynthesis: r=0 templates filtered to fragmentation
+# Simplifying retrosynthesis: r=0 templates filtered to the simplifying set
 # (product always decomposes into simpler precursors).
 # Joint template + reaction-center head. num_classes auto-set from meta.json.
 

@@ -21,7 +21,11 @@ def main():
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
     sc = SCScorer()
-    sc.restore(glob.glob("/home/zbc/scscore_repo/models/full_reaxys_model_1024uint8/*.json.gz")[0])
+    # Point SCSCORE_MODEL at your local SCScore 1024-bit model: either a directory
+    # of *.json.gz files, or a direct path to the model json.gz.
+    scscore_model = os.environ.get("SCSCORE_MODEL", "scscore_1024uint8")
+    cand = glob.glob(os.path.join(scscore_model, "*.json.gz")) or glob.glob(scscore_model)
+    sc.restore(cand[0])
 
     smis = [l.strip().split()[0] for l in open(args.smiles) if l.strip()]
     t0 = time.time()

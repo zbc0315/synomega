@@ -3,5 +3,5 @@
   "n_templates_in": 64366,
   "n_kept": 42028,
   "kept_frac": 0.6529534226144238,
-  "criterion": "keep = product 1 molecule AND reactants >= 2 molecules (fragmentation)"
+  "criterion": "keep = product 1 molecule AND reactants >= 2 molecules (simplifying)"
 }

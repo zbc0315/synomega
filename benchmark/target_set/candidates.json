@@ -1,0 +1,354 @@
+[
+ {
+  "smiles": "CCC(=O)NCC(CO)c1cccc2ccc(OC)cc12",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "CCC(=O)NCC(CO)c1cccc2ccc(OC)cc12 >> CCC(=O)Cl.COc1ccc2cccc(C(CN)CO)c2c1",
+   "COc1ccc2cccc(C(CN)CO)c2c1 >> COc1ccc2ccccc2c1.NCCCO"
+  ],
+  "original_steps": [
+   "CCC(=O)NCC(CO)c1cccc2ccc(OC)cc12 >> CCC(=O)NCC(C(=O)OC)c1cccc2ccc(OC)cc12",
+   "CCC(=O)NCC(C(=O)OC)c1cccc2ccc(OC)cc12 >> CCC(=O)Cl.COC(=O)C(CN)c1cccc2ccc(OC)cc12",
+   "COC(=O)C(CN)c1cccc2ccc(OC)cc12 >> COC(=O)C(C#N)c1cccc2ccc(OC)cc12",
+   "COC(=O)C(C#N)c1cccc2ccc(OC)cc12 >> COC(=O)OC.COc1ccc2cccc(CC#N)c2c1"
+  ]
+ },
+ {
+  "smiles": "CCn1cc(NC(=O)NCC(c2ccsc2)N(C)C)cn1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "CCn1cc(NC(=O)NCC(c2ccsc2)N(C)C)cn1 >> CCn1cc(N)cn1.CN(C)C(CN)c1ccsc1.O=C(n1ccnc1)n1ccnc1",
+   "CN(C)C(CN)c1ccsc1 >> CN(C)CCN.Clc1ccsc1"
+  ],
+  "original_steps": [
+   "CCn1cc(NC(=O)NCC(c2ccsc2)N(C)C)cn1 >> CCn1cc(N)cn1.CN(C)C(CN)c1ccsc1.O=C(n1ccnc1)n1ccnc1",
+   "CN(C)C(CN)c1ccsc1 >> CN(C)C(C#N)c1ccsc1",
+   "CN(C)C(C#N)c1ccsc1 >> CNC.C[Si](C)(C)C#N.O=Cc1ccsc1",
+   "CNC >> CN(C)Cc1ccccc1"
+  ]
+ },
+ {
+  "smiles": "N#Cc1ccc(-c2ccc(OS(N)(=O)=O)cc2)cc1",
+  "simplify_nsteps": 1,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "N#Cc1ccc(-c2ccc(OS(N)(=O)=O)cc2)cc1 >> N#Cc1ccc(B(O)O)cc1.NS(=O)(=O)Oc1ccc(Cl)cc1"
+  ],
+  "original_steps": [
+   "N#Cc1ccc(-c2ccc(OS(N)(=O)=O)cc2)cc1 >> CC(C)(C)OC(=O)NS(=O)(=O)Oc1ccc(-c2ccc(C#N)cc2)cc1",
+   "CC(C)(C)OC(=O)NS(=O)(=O)Oc1ccc(-c2ccc(C#N)cc2)cc1 >> CC(C)(C)OC(=O)NS(=O)(=O)Oc1ccc(Br)cc1.N#Cc1ccc(B(O)O)cc1",
+   "CC(C)(C)OC(=O)NS(=O)(=O)Oc1ccc(Br)cc1 >> CC(C)(C)OC(=O)NS(=O)(=O)O.Oc1ccc(Br)cc1",
+   "CC(C)(C)OC(=O)NS(=O)(=O)O >> CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.NS(=O)(=O)O"
+  ]
+ },
+ {
+  "smiles": "COc1ccc(-c2cn(CCO)nc2-c2ccc(OC)cc2)cc1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "COc1ccc(-c2cn(CCO)nc2-c2ccc(OC)cc2)cc1 >> COc1ccc(-c2cn(CCO)nc2B(O)O)cc1.COc1ccc(I)cc1",
+   "COc1ccc(-c2cn(CCO)nc2B(O)O)cc1 >> CC(C)OB(OC(C)C)OC(C)C.COc1ccc(-c2cnn(CCO)c2)cc1"
+  ],
+  "original_steps": [
+   "COc1ccc(-c2cn(CCO)nc2-c2ccc(OC)cc2)cc1 >> COc1ccc(-c2c[nH]nc2-c2ccc(OC)cc2)cc1.OCCCl",
+   "COc1ccc(-c2c[nH]nc2-c2ccc(OC)cc2)cc1 >> COc1ccc(-c2n[nH]cc2B(O)O)cc1.COc1ccc(Br)cc1",
+   "COc1ccc(-c2n[nH]cc2B(O)O)cc1 >> CC(C)OB(OC(C)C)OC(C)C.COc1ccc(-c2n[nH]cc2Br)cc1",
+   "COc1ccc(-c2n[nH]cc2Br)cc1 >> Brc1c[nH]nc1Br.COc1ccc(B(O)O)cc1"
+  ]
+ },
+ {
+  "smiles": "O=C(CSc1snnc1-c1ccc2ccccc2c1)Nc1ccccc1F",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "O=C(CSc1snnc1-c1ccc2ccccc2c1)Nc1ccccc1F >> Brc1snnc1-c1ccc2ccccc2c1.O=C(CS)Nc1ccccc1F",
+   "Brc1snnc1-c1ccc2ccccc2c1 >> O=C1CCC(=O)N1Br.c1ccc2cc(-c3csnn3)ccc2c1"
+  ],
+  "original_steps": [
+   "O=C(CSc1snnc1-c1ccc2ccccc2c1)Nc1ccccc1F >> O=C(CCl)Nc1ccccc1F.[S-]c1snnc1-c1ccc2ccccc2c1",
+   "[S-]c1snnc1-c1ccc2ccccc2c1 >> Brc1ccc2ccccc2c1.[S-]c1cnns1",
+   "Brc1ccc2ccccc2c1 >> Nc1cccc2ccc(Br)cc12",
+   "[S-]c1cnns1 >> Sc1cnns1"
+  ]
+ },
+ {
+  "smiles": "COc1ccccc1C1C(C#N)=C(N)Oc2c1oc(CO)cc2=O",
+  "simplify_nsteps": 1,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "COc1ccccc1C1C(C#N)=C(N)Oc2c1oc(CO)cc2=O >> COc1ccccc1C=O.N#CCC#N.O=c1cc(O)oc(CO)c1"
+  ],
+  "original_steps": [
+   "COc1ccccc1C1C(C#N)=C(N)Oc2c1oc(CO)cc2=O >> COc1ccccc1.N#CCC#N.O=Cc1cc(=O)cc(CO)o1.O=c1cc(CO)occ1O",
+   "O=Cc1cc(=O)cc(CO)o1 >> O=Cc1cc(=O)cc(C=O)o1",
+   "O=Cc1cc(=O)cc(C=O)o1 >> CCOC(=O)c1cc(=O)cc(C=O)o1",
+   "CCOC(=O)c1cc(=O)cc(C=O)o1 >> CCOC(=O)c1cc(=O)cco1.CN(C)C=O"
+  ]
+ },
+ {
+  "smiles": "CC(C)=CCOc1cc(C(CO)Cc2cccc3ccccc23)ncc1C",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "CC(C)=CCOc1cc(C(CO)Cc2cccc3ccccc23)ncc1C >> CC(C)=CCO.Cc1cnc(C(CO)Cc2cccc3ccccc23)cc1Cl",
+   "Cc1cnc(C(CO)Cc2cccc3ccccc23)cc1Cl >> Cc1cnccc1Cl.OCCCc1cccc2ccccc12"
+  ],
+  "original_steps": [
+   "CC(C)=CCOc1cc(C(CO)Cc2cccc3ccccc23)ncc1C >> CC(C)=CCBr.Cc1cnc(C(CO)Cc2cccc3ccccc23)cc1O",
+   "Cc1cnc(C(CO)Cc2cccc3ccccc23)cc1O >> Cc1cnc(C(C=O)Cc2cccc3ccccc23)cc1O",
+   "Cc1cnc(C(C=O)Cc2cccc3ccccc23)cc1O >> CCOC=O.Cc1cnc(CCc2cccc3ccccc23)cc1O",
+   "Cc1cnc(CCc2cccc3ccccc23)cc1O >> C=Cc1cccc2ccccc12.Cc1cnccc1O"
+  ]
+ },
+ {
+  "smiles": "C[C@H](CCCN1CCN(C)CC1)Nc1ccnc2cc(Cl)ccc12",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "C[C@H](CCCN1CCN(C)CC1)Nc1ccnc2cc(Cl)ccc12 >> CN1CCNCC1.C[C@H](CCC=O)Nc1ccnc2cc(Cl)ccc12",
+   "C[C@H](CCC=O)Nc1ccnc2cc(Cl)ccc12 >> C=CC=O.CCNc1ccnc2cc(Cl)ccc12"
+  ],
+  "original_steps": [
+   "C[C@H](CCCN1CCN(C)CC1)Nc1ccnc2cc(Cl)ccc12 >> CN1CCNCC1.C[C@H](CCC=O)Nc1ccnc2cc(Cl)ccc12",
+   "C[C@H](CCC=O)Nc1ccnc2cc(Cl)ccc12 >> C[C@H](CCCO)Nc1ccnc2cc(Cl)ccc12",
+   "C[C@H](CCCO)Nc1ccnc2cc(Cl)ccc12 >> C[C@@H](N)CCCO.Clc1ccc2c(Cl)ccnc2c1",
+   "Clc1ccc2c(Cl)ccnc2c1 >> [O-][n+]1ccc(Cl)c2ccc(Cl)cc21"
+  ]
+ },
+ {
+  "smiles": "Cc1cc(C(=O)N(C)C)nc(C2(C)CCCN2c2ccccc2)n1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "Cc1cc(C(=O)N(C)C)nc(C2(C)CCCN2c2ccccc2)n1 >> CC1CCCN1c1ccccc1.Cc1cc(C(=O)N(C)C)nc(Cl)n1",
+   "CC1CCCN1c1ccccc1 >> CCC(=O)O.CCC(C)=O.Nc1ccccc1"
+  ],
+  "original_steps": [
+   "Cc1cc(C(=O)N(C)C)nc(C2(C)CCCN2c2ccccc2)n1 >> CCOC(=O)c1cc(C)nc(C2(C)CCCN2c2ccccc2)n1.CNC",
+   "CCOC(=O)c1cc(C)nc(C2(C)CCCN2c2ccccc2)n1 >> CC1CCCN1c1ccccc1.CCOC(=O)c1cc(C)nc(Cl)n1",
+   "CC1CCCN1c1ccccc1 >> CCC(=O)O.CCC(C)=O.Nc1ccccc1",
+   "CNC >> CN(C)Cc1ccccc1"
+  ]
+ },
+ {
+  "smiles": "O=C(CO)N1CCC(c2nnc3ccc(Sc4ccc(F)cc4F)cn23)CC1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "O=C(CO)N1CCC(c2nnc3ccc(Sc4ccc(F)cc4F)cn23)CC1 >> Fc1ccc(Sc2ccc3nnc(C4CCNCC4)n3c2)c(F)c1.O=C(O)CO",
+   "Fc1ccc(Sc2ccc3nnc(C4CCNCC4)n3c2)c(F)c1 >> Fc1ccc(S)c(F)c1.c1ccn2c(C3CCNCC3)nnc2c1"
+  ],
+  "original_steps": [
+   "O=C(CO)N1CCC(c2nnc3ccc(Sc4ccc(F)cc4F)cn23)CC1 >> Fc1ccc(Sc2ccc3nnc(C4CCNCC4)n3c2)c(F)c1.O=C(O)CO",
+   "Fc1ccc(Sc2ccc3nnc(C4CCNCC4)n3c2)c(F)c1 >> CC(C)(C)OC(=O)N1CCC(c2nnc3ccc(Sc4ccc(F)cc4F)cn23)CC1",
+   "CC(C)(C)OC(=O)N1CCC(c2nnc3ccc(Sc4ccc(F)cc4F)cn23)CC1 >> CC(C)(C)OC(=O)N1CCC(c2nnc3ccc(Br)cn23)CC1.Fc1ccc(S)c(F)c1",
+   "CC(C)(C)OC(=O)N1CCC(c2nnc3ccc(Br)cn23)CC1 >> CC(C)(C)OC(=O)N1CCC(C(=O)NN)CC1.Clc1ccc(Br)cn1"
+  ]
+ },
+ {
+  "smiles": "NC(=O)C1CCCN1C(=O)C(Cc1c[nH]cn1)NC(=O)C1CCCC1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "NC(=O)C1CCCN1C(=O)C(Cc1c[nH]cn1)NC(=O)C1CCCC1 >> NC(=O)C1CCCN1C(=O)[C@H](N)Cc1c[nH]cn1.O=C(O)C1CCCC1",
+   "NC(=O)C1CCCN1C(=O)[C@H](N)Cc1c[nH]cn1 >> NC(=O)[C@H]1CCCN1.N[C@H](Cc1c[nH]cn1)C(=O)O"
+  ],
+  "original_steps": [
+   "NC(=O)C1CCCN1C(=O)C(Cc1c[nH]cn1)NC(=O)C1CCCC1 >> NC(=O)C1CCCN1C(=O)[C@H](N)Cc1c[nH]cn1.O=C(O)C1CCCC1",
+   "NC(=O)C1CCCN1C(=O)[C@H](N)Cc1c[nH]cn1 >> NC(=O)C1CCCN1.N[C@H](Cc1c[nH]cn1)C(=O)O",
+   "NC(=O)C1CCCN1 >> NC(=O)C1=NCCC1",
+   "NC(=O)C1=NCCC1 >> NC(=O)[C@@H]1CCCN1"
+  ]
+ },
+ {
+  "smiles": "O=C(COC(=O)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1)NCc1ccco1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "O=C(COC(=O)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1)NCc1ccco1 >> O=C(CO)NCc1ccco1.O=C(Cl)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1",
+   "O=C(Cl)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1 >> O=C(Cl)c1ccc(Cl)cc1.O=S(=O)(O)N1CCOCC1"
+  ],
+  "original_steps": [
+   "O=C(COC(=O)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1)NCc1ccco1 >> O=C(CO)NCc1ccco1.O=C(O)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1",
+   "O=C(O)c1ccc(Cl)c(S(=O)(=O)N2CCOCC2)c1 >> O=C=O.O=S(=O)(c1ccccc1Cl)N1CCOCC1",
+   "O=C=O >> O=C(O)C(=O)O",
+   "O=S(=O)(c1ccccc1Cl)N1CCOCC1 >> C1COCCN1.NNS(=O)(=O)c1ccccc1Cl"
+  ]
+ },
+ {
+  "smiles": "COc1ccc(NC(=O)CCNS(=O)(=O)c2ccc3c(c2)CCN3C(=O)C2CC2)cc1Cl",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "COc1ccc(NC(=O)CCNS(=O)(=O)c2ccc3c(c2)CCN3C(=O)C2CC2)cc1Cl >> COc1ccc(NC(=O)CCNS(=O)(=O)c2ccc3c(c2)CCN3)cc1Cl.O=C(Cl)C1CC1",
+   "COc1ccc(NC(=O)CCNS(=O)(=O)c2ccc3c(c2)CCN3)cc1Cl >> COc1ccc(NC(=O)CCCl)cc1Cl.NS(=O)(=O)c1ccc2c(c1)CCN2"
+  ],
+  "original_steps": [
+   "COc1ccc(NC(=O)CCNS(=O)(=O)c2ccc3c(c2)CCN3C(=O)C2CC2)cc1Cl >> COc1ccc(NC(=O)C=CNS(=O)(=O)c2ccc3c(c2)CCN3C(=O)C2CC2)cc1Cl",
+   "COc1ccc(NC(=O)C=CNS(=O)(=O)c2ccc3c(c2)CCN3C(=O)C2CC2)cc1Cl >> COc1ccc(N)cc1Cl.O=C(O)C=CNS(=O)(=O)c1ccc2c(c1)CCN2C(=O)C1CC1",
+   "O=C(O)C=CNS(=O)(=O)c1ccc2c(c1)CCN2C(=O)C1CC1 >> C=CC(=O)O.NS(=O)(=O)c1ccc2c(c1)CCN2C(=O)C1CC1",
+   "NS(=O)(=O)c1ccc2c(c1)CCN2C(=O)C1CC1 >> NS(=O)(=O)c1ccc2c(c1)CCN2.O=C(Cl)C1CC1"
+  ]
+ },
+ {
+  "smiles": "Cc1cc(C)cc(Nc2cnn(C34CC5CC(CC(CC(=O)O)(C5)C3)C4)c(=O)c2Cl)c1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "Cc1cc(C)cc(Nc2cnn(C34CC5CC(CC(CC(=O)O)(C5)C3)C4)c(=O)c2Cl)c1 >> Cc1cc(C)cc(Cl)c1.Nc1cnn(C23CC4CC(CC(CC(=O)O)(C4)C2)C3)c(=O)c1Cl",
+   "Nc1cnn(C23CC4CC(CC(CC(=O)O)(C4)C2)C3)c(=O)c1Cl >> Nc1cn[nH]c(=O)c1Cl.O=C(O)CC12CC3CC(CC(C3)C1)C2"
+  ],
+  "original_steps": [
+   "Cc1cc(C)cc(Nc2cnn(C34CC5CC(CC(CC(=O)O)(C5)C3)C4)c(=O)c2Cl)c1 >> Cc1cc(C)cc(N)c1.O=C(O)CC12CC3CC(C1)CC(n1ncc(Cl)c(Cl)c1=O)(C3)C2",
+   "O=C(O)CC12CC3CC(C1)CC(n1ncc(Cl)c(Cl)c1=O)(C3)C2 >> CCOC(=O)CC12CC3CC(C1)CC(n1ncc(Cl)c(Cl)c1=O)(C3)C2",
+   "CCOC(=O)CC12CC3CC(C1)CC(n1ncc(Cl)c(Cl)c1=O)(C3)C2 >> CCOC(=O)CC12CC3CC(CC(Br)(C3)C1)C2.O=c1[nH]ncc(Cl)c1Cl",
+   "CCOC(=O)CC12CC3CC(CC(Br)(C3)C1)C2 >> BrC12CC3CC(CC(C3)C1)C2.CCOC(=O)CBr"
+  ]
+ },
+ {
+  "smiles": "CCCn1c(=O)c2nc(-c3ccc(OCC(=O)Nc4ccc(F)cc4)cc3)[nH]c2n(CCC)c1=O",
+  "simplify_nsteps": 2,
+  "original_nsteps": 4,
+  "simplify_steps": [
+   "CCCn1c(=O)c2nc(-c3ccc(OCC(=O)Nc4ccc(F)cc4)cc3)[nH]c2n(CCC)c1=O >> CCCn1c(=O)c2nc(-c3ccc(O)cc3)[nH]c2n(CCC)c1=O.O=C(CCl)Nc1ccc(F)cc1",
+   "CCCn1c(=O)c2nc(-c3ccc(O)cc3)[nH]c2n(CCC)c1=O >> CCCn1c(=O)c2nc[nH]c2n(CCC)c1=O.Oc1ccc(Br)cc1"
+  ],
+  "original_steps": [
+   "CCCn1c(=O)c2nc(-c3ccc(OCC(=O)Nc4ccc(F)cc4)cc3)[nH]c2n(CCC)c1=O >> CCCn1c(=O)c2nc(-c3ccc(O)cc3)[nH]c2n(CCC)c1=O.O=C(CCl)Nc1ccc(F)cc1",
+   "CCCn1c(=O)c2nc(-c3ccc(O)cc3)[nH]c2n(CCC)c1=O >> CCCn1c(=O)c2nc(-c3ccc(OC)cc3)[nH]c2n(CCC)c1=O",
+   "CCCn1c(=O)c2nc(-c3ccc(OC)cc3)[nH]c2n(CCC)c1=O >> CCCn1c(=O)c2nc(B(O)O)[nH]c2n(CCC)c1=O.COc1ccc(Br)cc1",
+   "CCCn1c(=O)c2nc(B(O)O)[nH]c2n(CCC)c1=O >> CC(C)OB(OC(C)C)OC(C)C.CCCn1c(=O)c2nc[nH]c2n(CCC)c1=O"
+  ]
+ },
+ {
+  "smiles": "CCn1c(Cn2cncn2)nnc1C1CCN(C2CCNCC2)CC1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "CCn1c(Cn2cncn2)nnc1C1CCN(C2CCNCC2)CC1 >> CCn1c(Cn2cncn2)nnc1C1CCNCC1.O=C1CCNCC1",
+   "CCn1c(Cn2cncn2)nnc1C1CCNCC1 >> CCNC(=O)C1CCNCC1.NNC(=O)Cn1cncn1"
+  ],
+  "original_steps": [
+   "CCn1c(Cn2cncn2)nnc1C1CCN(C2CCNCC2)CC1 >> CCn1c(Cn2cncn2)nnc1C1CCNCC1.O=C1CCNCC1",
+   "CCn1c(Cn2cncn2)nnc1C1CCNCC1 >> CCn1c(Cn2cncn2)nnc1C1CCN(C(=O)OC(C)(C)C)CC1",
+   "CCn1c(Cn2cncn2)nnc1C1CCN(C(=O)OC(C)(C)C)CC1 >> CCn1c(CCl)nnc1C1CCN(C(=O)OC(C)(C)C)CC1.c1nc[nH]n1",
+   "CCn1c(CCl)nnc1C1CCN(C(=O)OC(C)(C)C)CC1 >> CCNC(=S)C1CCN(C(=O)OC(C)(C)C)CC1.NNC(=O)CCl",
+   "CCNC(=S)C1CCN(C(=O)OC(C)(C)C)CC1 >> CC(C)(C)OC(=O)N1CCCCC1.CCN=C=S"
+  ]
+ },
+ {
+  "smiles": "Cc1sc2nc(CCN)nc(N(CCN(C)C)CC3CCCO3)c2c1C",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "Cc1sc2nc(CCN)nc(N(CCN(C)C)CC3CCCO3)c2c1C >> CN(C)CCNCC1CCCO1.Cc1sc2nc(CCN)[nH]c(=O)c2c1C",
+   "CN(C)CCNCC1CCCO1 >> CN(C)CCN.O=Cc1ccco1"
+  ],
+  "original_steps": [
+   "Cc1sc2nc(CCN)nc(N(CCN(C)C)CC3CCCO3)c2c1C >> Cc1sc2nc(CC#N)nc(N(CCN(C)C)CC3CCCO3)c2c1C",
+   "Cc1sc2nc(CC#N)nc(N(CCN(C)C)CC3CCCO3)c2c1C >> CN(C)CCNCC1CCCO1.Cc1sc2nc(CC#N)nc(Cl)c2c1C",
+   "CN(C)CCNCC1CCCO1 >> CN(C)CCN.ClCC1CCCO1",
+   "ClCC1CCCO1 >> ClCc1ccco1",
+   "Cc1sc2nc(CC#N)nc(Cl)c2c1C >> Cc1sc2ncnc(Cl)c2c1C.N#CCOc1ccc(Cl)cc1"
+  ]
+ },
+ {
+  "smiles": "CC(CCc1cccc(OCc2ccc3ccccc3n2)c1)Cc1nnn[nH]1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "CC(CCc1cccc(OCc2ccc3ccccc3n2)c1)Cc1nnn[nH]1 >> CC(CCc1cccc(O)c1)Cc1nnn[nH]1.ClCc1ccc2ccccc2n1",
+   "CC(CCc1cccc(O)c1)Cc1nnn[nH]1 >> CCCc1nnn[nH]1.Oc1cccc(CCBr)c1"
+  ],
+  "original_steps": [
+   "CC(CCc1cccc(OCc2ccc3ccccc3n2)c1)Cc1nnn[nH]1 >> CC(CCc1cccc(O)c1)Cc1nnn[nH]1.ClCc1ccc2ccccc2n1",
+   "CC(CCc1cccc(O)c1)Cc1nnn[nH]1 >> COc1cccc(CCC(C)Cc2nnn[nH]2)c1",
+   "COc1cccc(CCC(C)Cc2nnn[nH]2)c1 >> COc1cccc(C=CC(C)Cc2nnn[nH]2)c1",
+   "COc1cccc(C=CC(C)Cc2nnn[nH]2)c1 >> COc1cccc(C#CC(C)Cc2nnn[nH]2)c1",
+   "COc1cccc(C#CC(C)Cc2nnn[nH]2)c1 >> C#Cc1cccc(OC)c1.CCCc1nnn[nH]1"
+  ]
+ },
+ {
+  "smiles": "COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(NC4CCN(C)CC4)c3)c2c1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(NC4CCN(C)CC4)c3)c2c1 >> CN1CCC(=O)CC1.COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(N)c3)c2c1",
+   "COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(N)c3)c2c1 >> COc1ccc2cc[nH]c2c1.Nc1cc(S(=O)(=O)O)ccc1Cl"
+  ],
+  "original_steps": [
+   "COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(NC4CCN(C)CC4)c3)c2c1 >> CN1CCC(N)CC1.COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(Br)c3)c2c1",
+   "COc1ccc2ccn(S(=O)(=O)c3ccc(Cl)c(Br)c3)c2c1 >> COc1ccc2cc[nH]c2c1.O=S(=O)(Cl)c1ccc(Cl)c(Br)c1",
+   "O=S(=O)(Cl)c1ccc(Cl)c(Br)c1 >> Clc1ccccc1Br.O=S(=O)(O)Cl",
+   "O=S(=O)(O)Cl >> Cl.O=S(=O)=O",
+   "Cl >> ClC(Cl)(Cl)Cl"
+  ]
+ },
+ {
+  "smiles": "CNCC(NC(=O)c1ccc(-c2ccc(C)c(F)c2)[nH]1)c1nc(C)c(CO)s1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "CNCC(NC(=O)c1ccc(-c2ccc(C)c(F)c2)[nH]1)c1nc(C)c(CO)s1 >> CNCC(N)c1nc(C)c(CO)s1.Cc1ccc(-c2ccc(C(=O)O)[nH]2)cc1F",
+   "CNCC(N)c1nc(C)c(CO)s1 >> CNCCN.Cc1ncsc1CO"
+  ],
+  "original_steps": [
+   "CNCC(NC(=O)c1ccc(-c2ccc(C)c(F)c2)[nH]1)c1nc(C)c(CO)s1 >> Cc1ccc(-c2ccc(C(=O)NC(CN(C)C(=O)OC(C)(C)C)c3nc(C)c(CO)s3)[nH]2)cc1F",
+   "Cc1ccc(-c2ccc(C(=O)NC(CN(C)C(=O)OC(C)(C)C)c3nc(C)c(CO)s3)[nH]2)cc1F >> Cc1ccc(-c2ccc(C(=O)O)[nH]2)cc1F.Cc1nc(C(N)CN(C)C(=O)OC(C)(C)C)sc1CO",
+   "Cc1nc(C(N)CN(C)C(=O)OC(C)(C)C)sc1CO >> Cc1nc(C(CN(C)C(=O)OC(C)(C)C)N=[N+]=[N-])sc1CO",
+   "Cc1nc(C(CN(C)C(=O)OC(C)(C)C)N=[N+]=[N-])sc1CO >> CCOC(=O)c1sc(C(CN(C)C(=O)OC(C)(C)C)N=[N+]=[N-])nc1C",
+   "CCOC(=O)c1sc(C(CN(C)C(=O)OC(C)(C)C)N=[N+]=[N-])nc1C >> CCOC(=O)c1sc(Cl)nc1C.CN(CCN=[N+]=[N-])C(=O)OC(C)(C)C"
+  ]
+ },
+ {
+  "smiles": "O=C(CCNC(=O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1)NCc1ccc(F)cc1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "O=C(CCNC(=O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1)NCc1ccc(F)cc1 >> NCCC(=O)NCc1ccc(F)cc1.O=C(O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1",
+   "O=C(O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1 >> O=C(O)C1CCNCC1.O=S(=O)(O)c1ccc(F)cc1"
+  ],
+  "original_steps": [
+   "O=C(CCNC(=O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1)NCc1ccc(F)cc1 >> NCCC(=O)NCc1ccc(F)cc1.O=C(O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1",
+   "O=C(O)C1CCN(S(=O)(=O)c2ccc(F)cc2)CC1 >> O=C(O)C1CCNCC1.O=S(=O)(Cl)c1ccc(F)cc1",
+   "O=S(=O)(Cl)c1ccc(F)cc1 >> Fc1ccccc1.O=S(=O)(O)Cl",
+   "O=S(=O)(O)Cl >> Cl.O=S(=O)=O",
+   "Cl >> ClC(Cl)(Cl)Cl"
+  ]
+ },
+ {
+  "smiles": "O=C(/C=C/c1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12)c1ccncc1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 5,
+  "simplify_steps": [
+   "O=C(/C=C/c1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12)c1ccncc1 >> CC(=O)c1ccncc1.O=Cc1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12",
+   "O=Cc1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12 >> O=Cc1c[nH]c2ccccc12.O=[N+]([O-])c1ccc(S(=O)(=O)O)cc1"
+  ],
+  "original_steps": [
+   "O=C(/C=C/c1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12)c1ccncc1 >> Cc1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12.O=CC(=O)c1ccncc1",
+   "Cc1cn(S(=O)(=O)c2ccc([N+](=O)[O-])cc2)c2ccccc12 >> Cc1c[nH]c2ccccc12.O=[N+]([O-])c1ccc(S(=O)(=O)Cl)cc1",
+   "O=[N+]([O-])c1ccc(S(=O)(=O)Cl)cc1 >> O=S(=O)(O)Cl.O=[N+]([O-])c1ccccc1",
+   "O=S(=O)(O)Cl >> Cl.O=S(=O)=O",
+   "Cl >> ClC(Cl)(Cl)Cl"
+  ]
+ },
+ {
+  "smiles": "Cc1ccc(S(=O)(=O)N2CCC(C(=O)N3CCN(Cc4ccccc4)CC3)CC2)cc1",
+  "simplify_nsteps": 2,
+  "original_nsteps": 6,
+  "simplify_steps": [
+   "Cc1ccc(S(=O)(=O)N2CCC(C(=O)N3CCN(Cc4ccccc4)CC3)CC2)cc1 >> Cc1ccc(S(=O)(=O)N2CCC(C(=O)O)CC2)cc1.c1ccc(CN2CCNCC2)cc1",
+   "Cc1ccc(S(=O)(=O)N2CCC(C(=O)O)CC2)cc1 >> Cc1ccc(S(=O)(=O)O)cc1.O=C(O)C1CCNCC1"
+  ],
+  "original_steps": [
+   "Cc1ccc(S(=O)(=O)N2CCC(C(=O)N3CCN(Cc4ccccc4)CC3)CC2)cc1 >> Cc1ccc(S(=O)(=O)Cl)cc1.O=C(C1CCNCC1)N1CCN(Cc2ccccc2)CC1",
+   "Cc1ccc(S(=O)(=O)Cl)cc1 >> Cc1ccccc1.O=S(=O)(O)Cl",
+   "O=S(=O)(O)Cl >> Cl.O=S(=O)=O",
+   "Cl >> ClC(Cl)(Cl)Cl",
+   "O=C(C1CCNCC1)N1CCN(Cc2ccccc2)CC1 >> CC(C)(C)OC(=O)N1CCC(C(=O)N2CCN(Cc3ccccc3)CC2)CC1",
+   "CC(C)(C)OC(=O)N1CCC(C(=O)N2CCN(Cc3ccccc3)CC2)CC1 >> CC(C)(C)OC(=O)N1CCC(C(=O)O)CC1.c1ccc(CN2CCNCC2)cc1"
+  ]
+ }
+]

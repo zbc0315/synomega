@@ -1,15 +1,15 @@
 #!/bin/bash
-# k-sweep for the FULL (unconstrained) model at expansion width k = 3..10, same
+# k-sweep for the ORIGINAL (unconstrained) model at expansion width k = 3..10, same
 # fixed budget as the simplify sweep (8 s / <=100 expansions / depth 5 / 60 s cap).
-# Complements run_ksweep_chembl.sh (gold = full@50, simplify k=3..10): together they
-# show how full and simplify each approach the full@50 gold as k grows, and their
+# Complements run_ksweep_chembl.sh (gold = original @ k=50, simplify k=3..10): together
+# they show how original and simplify each approach the original @ k=50 gold as k grows, and their
 # efficiency / scoring-accuracy trade-offs. Per-molecule bb_coverage/expansions/time
 # recorded on all 1000 ChEMBL targets.
 source ~/miniconda3/etc/profile.d/conda.sh && conda activate template-gnn
 export PYTHONPATH=~/synomega_pkg/src
 cd ~/Projects/retrosyn/benchmarks/chembl_rerun
 
-CMP=~/Projects/retrosyn/benchmarks/simplify_eval/scripts/compare_simplify_vs_full.py
+CMP=~/Projects/retrosyn/benchmarks/simplify_eval/scripts/compare_simplify_vs_original.py
 STOCK=~/synomega_assets/zinc_stock_keys.txt.gz
 BASE="--time-limit 8 --max-expansions 100 --hard-timeout 60"
 mkdir -p results/ksweep/shards
@@ -30,6 +30,6 @@ run_config () {   # $1=run_dir  $2=width  $3=outname
 }
 
 for k in 3 4 5 6 7 8 9 10; do
-  run_config ~/synomega_pkg/run_r20 "$k" "full_k$(printf %02d "$k")"
+  run_config ~/synomega_pkg/run_r20 "$k" "original_k$(printf %02d "$k")"
 done
-echo "FULLSWEEP_DONE"
+echo "ORIGINALSWEEP_DONE"
