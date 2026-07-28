@@ -43,12 +43,12 @@ import synomega
 planner = synomega.load_default_planner()          # downloads model + stock once
 print(planner.plan("CC(=O)Nc1ccccc1O").best_route.describe())
 
-# Synthesizability scoring uses the simplification-constrained ("breaking")
+# Synthesizability scoring uses the simplification-constrained ("simplifying")
 # single-step model by default -- the recommended model for scoring -- at the
 # k=10 expansion-width operating point.
 scorer = synomega.load_default_scorer()            # simplify=True, k=10 by default
 score = scorer.score("CC(=O)Nc1ccccc1O", max_steps=5)
-print(score.bb_coverage, score.min_steps)
+print(score.score, score.solved)                   # SynScore, and whether a purchasable route was found
 ```
 
 Or pre-fetch from the command line, then use the CLI with no `--model`/`--stock`:
@@ -82,7 +82,7 @@ print(result.best_route.describe())
 
 ```
 target: CC(=O)Nc1ccccc1
-solved: True  steps: 2  depth: 2  bb_coverage: 1.00
+solved: True  steps: 2  depth: 2
   [1] CC(=O)O.Nc1ccccc1>>CC(=O)Nc1ccccc1  (score=0.4348)
   [2] O=[N+]([O-])c1ccccc1>>Nc1ccccc1     (score=0.2174)
 ```
@@ -94,13 +94,12 @@ scorer = SynthesizabilityScorer(planner)
 
 r = scorer.score("CC(=O)Nc1ccccc1", max_steps=5)
 r.solved            # True — a complete route to purchasable material exists
-r.bb_coverage       # 1.0 — fraction of the best route's leaves that are buyable
+r.score             # 1.0 — SynScore = 1/(U+1)**U (U = non-purchasable starting materials)
 r.min_steps         # 2  — reactions in the shortest solved route
 r.min_route_depth   # 2  — longest linear sequence of that route
 
 report = scorer.score_batch(targets, max_steps=5)
 report.solve_rate         # fraction of targets solved
-report.mean_bb_coverage
 report.to_dataframe()
 ```
 
@@ -149,14 +148,14 @@ When enabled, each surviving prediction carries its raw plausibility in
 ## Simplification-constrained model
 
 An alternative single-step model is restricted, at the reaction-template level, to
-**simplifying (fragmentation) disconnections** — those that split the target into
+**simplifying disconnections** — those that split the target into
 two or more precursors. In multi-step search it reaches purchasable material with
 fewer node expansions at matched solvability (about 30% fewer expansions and ~2x
 faster median search on a drug-like benchmark; see [`benchmark/`](benchmark/) and
 the accompanying paper). It downloads on first use like the default model:
 
 ```python
-planner = synomega.load_default_planner(simplify=True)   # fragmentation-only model
+planner = synomega.load_default_planner(simplify=True)   # simplifying model
 
 from synomega.singlestep import TemplateGNN
 model = TemplateGNN.simplify(device="cpu")               # or load it directly
@@ -175,17 +174,14 @@ answer different questions.
 | Metric | Meaning | Use it for |
 |---|---|---|
 | `solved@N` / `solve_rate` | **Binary** — does a route of depth ≤ N exist whose leaves are *all* purchasable? | Comparing against published numbers |
-| `bb_coverage@N` | **Continuous** — fraction of the best route's leaves that are purchasable | Ranking molecules by how close they are |
 | `score` | **Continuous** — `1/(U+1)**U` where `U` = number of non-purchasable starting materials (U=0 → 1.0, 1 → 0.5, 2 → 0.11; no route → 0) | Ranking with a sharp solved / few-missing / many-missing separation |
 
-`bb_coverage` matters because most targets are unsolved at realistic step limits.
-A 5-step route with 4 of 5 leaves buyable scores 0.8, not 0 — so a near-miss is
-distinguishable from a total failure, and a set of molecules can be *ranked*
-rather than merely split into solved/unsolved. The headline **`score`** =
-`1/(U+1)**U`, where `U` is the number of non-purchasable starting materials in the
-best route, falls off sharply with each missing building block (U=0 → 1.0, 1 → 0.5,
-2 → 0.11, 3 → 0.016), so it cleanly separates a solved target, one missing a few
-materials, and one missing many.
+The headline **`score`** = `1/(U+1)**U`, where `U` is the number of non-purchasable
+starting materials in the best route, falls off sharply with each missing building
+block (U=0 → 1.0, 1 → 0.5, 2 → 0.11, 3 → 0.016), so it cleanly separates a solved
+target, one missing a few materials, and one missing many. A near-miss is therefore
+distinguishable from a total failure, and a set of molecules can be *ranked* rather
+than merely split into solved/unsolved.
 
 ## Search algorithms
 
