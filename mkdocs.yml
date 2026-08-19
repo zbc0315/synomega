@@ -1,6 +1,10 @@
 site_name: SynOmega 文档
-site_description: SynOmega —— 逆合成 / 可合成性预测软件的功能说明与研究报告
+site_description: SynOmega —— 有机小分子反应预测软件的功能说明与研究报告
 site_author: SynOmega
+# Required for a project-page deploy: the language switcher, canonical and
+# sitemap links are built against this base. Without it they resolve to the
+# domain root (/en/), which 404s under the /synomega/ subpath.
+site_url: https://zbc0315.github.io/synomega/
 repo_url: https://github.com/zbc0315/synomega
 repo_name: zbc0315/synomega
 docs_dir: docs

@@ -4,7 +4,7 @@
 
 ## One-sentence positioning
 
-> Give it a SMILES, and it tells you: whether the molecule can be synthesized from purchasable materials within N steps, what the optimal route looks like, and a synthesizability score between 0 and 1.
+> From forward prediction ("reactants → product"), to retrosynthetic disconnection ("product → reactants"), to planning and scoring ("target molecule → multi-step route → synthesizability score") — SynOmega covers several stages of organic small-molecule reaction prediction with one shared set of reaction templates and graph models.
 
 ## Why three layers
 
@@ -22,7 +22,7 @@ flowchart TD
 The layers connect only through a deliberately narrowed interface — a single-step backend only needs to implement
 `predict(smiles, top_k) -> [Prediction]` — so the planner and the scorer **do not care** whether the candidates come from a graph neural network, a Transformer, or pure template matching.
 
-Around these three layers, SynOmega also provides two independent capabilities:
+The single-step retrosynthesis, multi-step search, and synthesizability scoring above form the backbone of SynOmega; the other two capabilities share the same reaction templates and graph models:
 
 - **Single-step forward reaction prediction (forward)**: reactants → product, the "mirror image" of the retrosynthetic single-step model, reusing the same reaction template library.
 - **Reaction plausibility scoring (plausibility)**: assigns a reaction a score for "how chemically plausible it is".

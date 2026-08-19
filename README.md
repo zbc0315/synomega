@@ -4,8 +4,10 @@
 [![Python](https://img.shields.io/pypi/pyversions/synomega.svg)](https://pypi.org/project/synomega/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A retrosynthesis toolkit that turns a target molecule into synthesis routes and
-a **continuous synthesizability score**. Three decoupled layers:
+SynOmega covers a range of prediction tasks for organic small-molecule
+reactions — single-step forward and retro prediction, multi-step route planning,
+and a **continuous synthesizability score**. Its backbone is three decoupled
+layers:
 
 ```
 synthesizability   is this target reachable from purchasable material, in N steps?
