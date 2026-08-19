@@ -1,10 +1,6 @@
 # SynOmega
 
-**SynOmega covers a range of prediction capabilities for organic small-molecule reactions**, including single-step forward reaction prediction, single-step retrosynthesis, multi-step route planning, and synthesizability scoring. Given a target molecule, it produces a synthetic route starting from purchasable materials and outputs a continuous **synthesizability score, SynScore** — turning "is this molecule easy to make?" from a subjective one-liner into a reproducible, rankable number backed by an actual route.
-
-## One-sentence positioning
-
-> From forward prediction ("reactants → product"), to retrosynthetic disconnection ("product → reactants"), to planning and scoring ("target molecule → multi-step route → synthesizability score") — SynOmega covers several stages of organic small-molecule reaction prediction with one shared set of reaction templates and graph models.
+**SynOmega covers a range of prediction capabilities for organic small-molecule reactions**, including single-step forward reaction prediction, single-step retrosynthesis, multi-step route planning, and synthesizability scoring.
 
 ## Why three layers
 
