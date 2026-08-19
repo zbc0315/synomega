@@ -1,0 +1,62 @@
+name: docs
+
+# Build the MkDocs site and publish it to GitHub Pages on every push to main.
+# Pages source must be set to "GitHub Actions" (Settings -> Pages -> Source).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; cancel superseded runs.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Leak gate: the underlying corpus is never named in public docs. Fail the
+      # build if the vendor name slips into any published page.
+      - name: Guard against corpus-name leak
+        run: |
+          if grep -ril "reaxys" docs/ mkdocs.yml; then
+            echo "::error::vendor corpus name found — remove before publishing"
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build site
+        run: mkdocs build --strict
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

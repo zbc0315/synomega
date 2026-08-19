@@ -1,0 +1,6 @@
+# Documentation build dependencies (MkDocs Material site -> GitHub Pages).
+# The figures under docs/figures are pre-generated and committed; regenerating
+# them (make_figures.py / make_structures.py) additionally needs matplotlib and
+# rdkit, which the site build itself does not require.
+mkdocs-material>=9.5
+pymdown-extensions>=10.0

@@ -20,6 +20,14 @@ implements `predict(smiles, top_k) -> [Prediction]` — so the planner and the
 scorer do not care whether predictions come from a graph neural network, a
 transformer, or plain template matching.
 
+## Documentation
+
+Full documentation — features, CLI/API, and a per-module research report
+(single-step forward & retro prediction, multi-step planning, reaction
+plausibility, synthesizability scoring) with architectures, pseudocode, training
+sets, and evaluation figures — is published at
+**<https://zbc0315.github.io/synomega/>** (built from `docs/` on every push).
+
 ## Installation
 
 ```bash

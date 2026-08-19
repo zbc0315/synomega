@@ -1,0 +1,81 @@
+site_name: SynOmega 文档
+site_description: SynOmega —— 逆合成 / 可合成性预测软件的功能说明与研究报告
+site_author: SynOmega
+repo_url: https://github.com/zbc0315/synomega
+repo_name: zbc0315/synomega
+docs_dir: docs
+# Only the pages listed in nav are published; keep stray drafts out of docs/.
+# (Internal design notes live in ../docs_dev, outside docs_dir, so they are
+# never built or served.)
+strict: true
+
+# Kept in the repo for reproducibility / CI, but not published to the site.
+exclude_docs: |
+  requirements.txt
+  figures/*.py
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - content.code.copy
+    - search.highlight
+
+nav:
+  - 简介: index.md
+  - 主要功能: features.md
+  - 研究报告:
+      - 总览与评测协议: research/index.md
+      - 单步正向反应预测: research/forward.md
+      - 单步逆向反应预测: research/retro.md
+      - 多步反应路径规划: research/planning.md
+      - 反应合理性评分: research/plausibility.md
+      - 可合成性评分 SynScore: research/synscore.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+  # Render ```mermaid fences as diagrams. Without this custom fence, Material
+  # treats them as plain code blocks (GitHub's own preview renders them natively).
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search
