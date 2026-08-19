@@ -4,3 +4,4 @@
 # rdkit, which the site build itself does not require.
 mkdocs-material>=9.5
 pymdown-extensions>=10.0
+mkdocs-static-i18n>=1.2

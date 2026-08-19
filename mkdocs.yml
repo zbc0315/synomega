@@ -79,3 +79,26 @@ extra_javascript:
 
 plugins:
   - search
+  # Bilingual site: Chinese (default) + English, with a header language switcher.
+  # Suffix structure — page.md is zh, page.en.md is the English counterpart;
+  # figures are shared (their labels are already in English).
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: zh
+          default: true
+          name: 中文
+          build: true
+        - locale: en
+          name: English
+          build: true
+          nav_translations:
+            简介: Introduction
+            主要功能: Features
+            研究报告: Research Report
+            总览与评测协议: Overview & Evaluation Protocol
+            单步正向反应预测: Single-step Forward Prediction
+            单步逆向反应预测: Single-step Retrosynthesis
+            多步反应路径规划: Multi-step Route Planning
+            反应合理性评分: Reaction Plausibility
+            可合成性评分 SynScore: Synthesizability (SynScore)
