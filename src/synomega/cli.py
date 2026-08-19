@@ -115,6 +115,28 @@ def cmd_download(args) -> int:
     return 0
 
 
+def cmd_forward(args) -> int:
+    """Predict product(s) from reactants with the forward template model."""
+    from .forward import ForwardTemplateGNN
+
+    if args.model:
+        model = ForwardTemplateGNN.from_pretrained(
+            args.model, templates_path=args.templates,
+            device=args.device, topk_templates=args.topk_templates,
+        )
+    else:
+        model = ForwardTemplateGNN.default(
+            device=args.device, topk_templates=args.topk_templates,
+        )
+    preds = model.predict(args.reactants, top_k=args.top_k)
+    if not preds:
+        print("no product predicted")
+        return 1
+    for i, p in enumerate(preds, 1):
+        print(f"{i:>2}. {p.product}\tscore={p.score:.4f}\ttemplate={p.template_id}")
+    return 0
+
+
 def cmd_build_stock(args) -> int:
     """Precompute InChIKeys once so later loads are fast."""
     from .stock import InMemoryStock
@@ -180,6 +202,21 @@ def build_parser() -> argparse.ArgumentParser:
         "download",
         help="pre-fetch the default model + stock into the local cache",
     ).set_defaults(func=cmd_download)
+
+    sp_fwd = sub.add_parser("forward", help="predict product(s) from reactants")
+    sp_fwd.add_argument("reactants",
+                        help="reactant SMILES (dot-separated for multiple)")
+    sp_fwd.add_argument("--top-k", type=int, default=10,
+                        help="number of ranked products to print")
+    sp_fwd.add_argument("--topk-templates", type=int, default=10,
+                        help="templates searched per reactant set")
+    sp_fwd.add_argument("--model", default=None,
+                        help="run dir containing best.pt "
+                             "(default: download the forward model)")
+    sp_fwd.add_argument("--templates", default=None,
+                        help="label_to_template_smarts.json / templates TSV")
+    sp_fwd.add_argument("--device", default=None)
+    sp_fwd.set_defaults(func=cmd_forward)
 
     sp_stock = sub.add_parser("build-stock", help="catalogue -> InChIKey file")
     sp_stock.add_argument("--catalogue", required=True)

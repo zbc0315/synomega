@@ -18,18 +18,16 @@ Requires the `gnn` extra: `pip install synomega[gnn]`.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from ..chem.features import (
-    ATOM_FDIM,
     BOND_FDIM,
     atom_features,
     bond_features,
     compute_gasteiger,
     largest_fragment,
 )
-from ..chem.template import TemplateLibrary, apply_template
+from ..chem.template import TemplateLibrary, apply_template, load_template_library
 from .base import Prediction, SingleStepModel
 
 _TORCH_HINT = (
@@ -56,38 +54,21 @@ class TemplateGNN(SingleStepModel):
             import torch
         except ImportError as exc:  # pragma: no cover - environment dependent
             raise ImportError(_TORCH_HINT) from exc
-        from ._dmpnn import build_from_config
+        from ._dmpnn import load_dmpnn
 
         self.torch = torch
         self.templates = templates
         self.topk_templates = topk_templates
         self.batch_size = batch_size
 
-        state = torch.load(str(checkpoint), map_location="cpu", weights_only=False)
-        self.config = state["config"]
-        self.num_classes = int(state["num_classes"])
-
-        # Guard against featurization drift: if the vendored ATOM_FDIM no longer
-        # matches what the checkpoint was trained with, predictions would be
-        # silently wrong rather than erroring.
-        w_in = state["model"]["W_input.weight"]
-        expected = w_in.shape[1]
-        if expected != ATOM_FDIM + BOND_FDIM:
-            raise RuntimeError(
-                f"feature dimension mismatch: checkpoint expects "
-                f"{expected} (atom+bond) but synomega.chem.features gives "
-                f"{ATOM_FDIM + BOND_FDIM}. The vendored featurizer is out of "
-                f"sync with this checkpoint."
-            )
-
-        self.device = torch.device(
-            device if device is not None
-            else ("cuda" if torch.cuda.is_available() else "cpu")
+        # Shared checkpoint loader (also used by ForwardTemplateGNN); includes
+        # the atom+bond feature-dimension drift guard.
+        self.model, self.config, self.num_classes, self.device = load_dmpnn(
+            checkpoint, device
         )
-        model = build_from_config(self.config, self.num_classes)
-        model.load_state_dict(state["model"])
-        self.model = model.to(self.device).eval()
-        self.use_center = bool(use_center and getattr(model, "predict_center", False))
+        self.use_center = bool(
+            use_center and getattr(self.model, "predict_center", False)
+        )
 
     # ------------------------------------------------------------- loading
 
@@ -134,40 +115,10 @@ class TemplateGNN(SingleStepModel):
         searched for at `templates_path`, then `<run_dir>/label_to_template_smarts.json`,
         then the processed-data dir recorded in the checkpoint's config.
         """
-        run_dir = Path(run_dir)
-        ckpt = run_dir / checkpoint_name
-        if not ckpt.exists():
-            raise FileNotFoundError(f"no checkpoint at {ckpt}")
-
-        candidates: list[Path] = []
-        if templates_path is not None:
-            candidates.append(Path(templates_path))
-        candidates.append(run_dir / "label_to_template_smarts.json")
-
-        cfg_path = run_dir / "config.yaml"
-        if cfg_path.exists():
-            try:
-                import yaml
-                cfg = yaml.safe_load(cfg_path.read_text())
-                processed = Path(cfg["data"]["processed_dir"])
-                candidates.append(processed / "label_to_template_smarts.json")
-            except Exception:
-                pass
-
-        for cand in candidates:
-            if cand.exists():
-                lib = (
-                    TemplateLibrary.from_tsv(cand)
-                    if cand.suffix == ".tsv"
-                    else TemplateLibrary.from_json(cand)
-                )
-                return cls(ckpt, lib, **kwargs)
-
-        raise FileNotFoundError(
-            "could not locate a template map (label_to_template_smarts.json). "
-            f"Tried: {', '.join(str(c) for c in candidates)}. "
-            "Pass templates_path= explicitly."
+        ckpt, lib = load_template_library(
+            run_dir, checkpoint_name=checkpoint_name, templates_path=templates_path
         )
+        return cls(ckpt, lib, **kwargs)
 
     # ------------------------------------------------------------ featurize
 

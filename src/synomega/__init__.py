@@ -30,6 +30,7 @@ from __future__ import annotations
 __version__ = "0.7.0"
 
 from .chem import Molecule, Reaction
+from .forward import ForwardModel, ForwardPrediction
 from .planner import Planner
 from .route import Route
 from .search import Budget, SearchResult
@@ -130,6 +131,8 @@ __all__ = [
     "Reaction",
     "Prediction",
     "SingleStepModel",
+    "ForwardModel",
+    "ForwardPrediction",
     "BuildingBlockSet",
     "InMemoryStock",
 ]

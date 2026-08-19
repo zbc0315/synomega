@@ -101,6 +101,13 @@ _SIMPLIFY_MODEL_FILES = {
 }
 _STOCK_FILE = "zinc_stock_keys.txt.gz"
 _PLAUSIBILITY_FILE = "plaus_dual-best.pt"
+# Forward reaction-prediction model (reactants -> product). Shares the retro r20
+# template inventory, so it reuses the already-hosted label->SMARTS map and only
+# ships its own checkpoint.
+_FORWARD_MODEL_FILES = {
+    "best.pt": "r20_forward-best.pt",
+    "label_to_template_smarts.json": "label_to_template_smarts_r20.json",
+}
 
 
 def cache_dir() -> Path:
@@ -176,6 +183,21 @@ def ensure_simplify_model() -> Path:
     return run
 
 
+def ensure_forward_model() -> Path:
+    """Download the forward reaction-prediction model files; return the run dir.
+
+    ``SYNOMEGA_FORWARD_MODEL=/path/to/run_dir`` overrides with a local run dir.
+    The label->SMARTS map is the retro r20 map (identical label space).
+    """
+    override = os.environ.get("SYNOMEGA_FORWARD_MODEL", "").strip()
+    if override:
+        return Path(override)
+    run = cache_dir() / "r20_forward"
+    for local, remote in _FORWARD_MODEL_FILES.items():
+        _ensure(local, remote, run)
+    return run
+
+
 def ensure_default_stock() -> Path:
     """Download the default building-block stock; return its path."""
     return _ensure(_STOCK_FILE, _STOCK_FILE, cache_dir())
@@ -206,6 +228,7 @@ __all__ = [
     "cache_dir",
     "ensure_default_model",
     "ensure_simplify_model",
+    "ensure_forward_model",
     "ensure_default_stock",
     "ensure_default_plausibility_model",
     "ensure_default_assets",

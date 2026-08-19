@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from functools import lru_cache
+from itertools import permutations
 
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -118,6 +119,177 @@ def _sanitize_outcome(outcome_mols) -> tuple[str, ...] | None:
     return tuple(sorted(parts))
 
 
+# ------------------------------------------------------------------ forward
+
+@dataclass(frozen=True)
+class ForwardOutcome:
+    """One product produced by applying a template FORWARD to reactants."""
+
+    product: str                         # canonical SMILES, largest organic fragment
+    match_atoms: tuple[int, ...] = ()    # reactant atoms covered (currently unused)
+
+    @property
+    def smiles(self) -> str:
+        return self.product
+
+
+def _has_radical(mol) -> bool:
+    """True if any atom carries unpaired electrons.
+
+    RDKit accepts *under*-valent atoms by assigning radical electrons (an r=0
+    forward template applied to a fragment can leave a carbene/acyl-radical
+    carbon such as ``[C]=O``). Such products are chemically absurd, so we drop
+    them — RDKit's own sanitization only rejects *over*-valence, not this.
+    """
+    return any(a.GetNumRadicalElectrons() for a in mol.GetAtoms())
+
+
+def _canon_largest_product(smi: str) -> str | None:
+    """Largest organic fragment, atom maps stripped, canonical (GT-product form)."""
+    m = Chem.MolFromSmiles(smi)
+    if m is None:
+        return None
+    frags = Chem.GetMolFrags(m, asMols=True, sanitizeFrags=False)
+    if frags:
+        m = max(frags, key=lambda f: f.GetNumHeavyAtoms())
+    for atom in m.GetAtoms():
+        atom.SetAtomMapNum(0)
+    try:
+        return Chem.MolToSmiles(m)
+    except Exception:
+        return None
+
+
+@lru_cache(maxsize=50_000)
+def _compiled_forward(retro_smarts: str):
+    """Compile the FORWARD reaction from a retro template.
+
+    The library stores retro SMARTS ``product >> reactants``; reversing it around
+    ``>>`` gives the forward reaction ``reactants >> product``. Unlike
+    :func:`_compiled`, the reactant side may hold two or more templates (an
+    intermolecular reaction), so we do NOT require a single reactant template.
+    None when RDKit rejects the reversed SMARTS.
+
+    The reversal (swap around ``>>``, strip one outer paren layer) mirrors
+    ``evaluate_products.py``; keep it byte-for-byte.
+    """
+    if ">>" not in retro_smarts:
+        return None
+    lhs, rhs = retro_smarts.split(">>", 1)          # lhs = product, rhs = reactants
+    fwd = rhs.strip("()") + ">>" + lhs.strip("()")
+    try:
+        rxn = AllChem.ReactionFromSmarts(fwd)
+    except Exception:
+        return None
+    if rxn is None or rxn.GetNumReactantTemplates() == 0:
+        return None
+    return rxn
+
+
+def apply_template_forward(
+    retro_smarts: str,
+    reactants_smiles: str,
+    *,
+    max_outcomes: int = 64,
+) -> list[ForwardOutcome]:
+    """Apply one template FORWARD to a reactant set, returning distinct products.
+
+    Reverses the retro template, assigns the reactant fragments to the template's
+    reactant slots (every ordered assignment, so intermolecular templates fire on
+    all pairings), runs RDKit forward, and keeps every distinct product that
+    sanitizes and is radical-free. Returns an empty list when the template does
+    not compile, arity cannot be satisfied, or nothing survives.
+    """
+    rxn = _compiled_forward(retro_smarts)
+    if rxn is None:
+        return []
+    mol = Chem.MolFromSmiles(reactants_smiles)
+    if mol is None or mol.GetNumAtoms() == 0:
+        return []
+    frags = list(Chem.GetMolFrags(mol, asMols=True, sanitizeFrags=True))
+    if not frags or len(frags) > 8:              # >8 fragments: pathological, skip
+        return []
+    nslots = rxn.GetNumReactantTemplates()
+    if len(frags) < nslots:
+        return []
+
+    seen: dict[str, ForwardOutcome] = {}
+    for asg in permutations(range(len(frags)), nslots):
+        try:
+            outcomes = rxn.RunReactants(tuple(frags[i] for i in asg), maxProducts=1000)
+        except Exception:
+            continue
+        for outcome in outcomes:
+            for pmol in outcome:
+                if pmol is None:
+                    continue
+                try:
+                    Chem.SanitizeMol(pmol)
+                    if _has_radical(pmol):
+                        continue
+                    canon = _canon_largest_product(Chem.MolToSmiles(pmol))
+                except Exception:
+                    canon = None
+                if canon and canon not in seen:
+                    seen[canon] = ForwardOutcome(product=canon)
+                    if len(seen) >= max_outcomes:
+                        return list(seen.values())
+    return list(seen.values())
+
+
+# --------------------------------------------------------------- library load
+
+def load_template_library(
+    run_dir,
+    *,
+    checkpoint_name: str = "best.pt",
+    templates_path=None,
+):
+    """Locate a checkpoint and its label -> retro SMARTS map in a run directory.
+
+    Shared discovery for both the retro and forward template-GNN backends.
+    Returns ``(checkpoint_path, TemplateLibrary)``. The template map is searched
+    at ``templates_path``, then ``<run_dir>/label_to_template_smarts.json``, then
+    the processed-data dir recorded in the checkpoint's ``config.yaml``.
+    """
+    from pathlib import Path
+
+    run_dir = Path(run_dir)
+    ckpt = run_dir / checkpoint_name
+    if not ckpt.exists():
+        raise FileNotFoundError(f"no checkpoint at {ckpt}")
+
+    candidates: list[Path] = []
+    if templates_path is not None:
+        candidates.append(Path(templates_path))
+    candidates.append(run_dir / "label_to_template_smarts.json")
+
+    cfg_path = run_dir / "config.yaml"
+    if cfg_path.exists():
+        try:
+            import yaml
+            cfg = yaml.safe_load(cfg_path.read_text())
+            processed = Path(cfg["data"]["processed_dir"])
+            candidates.append(processed / "label_to_template_smarts.json")
+        except Exception:
+            pass
+
+    for cand in candidates:
+        if cand.exists():
+            lib = (
+                TemplateLibrary.from_tsv(cand)
+                if cand.suffix == ".tsv"
+                else TemplateLibrary.from_json(cand)
+            )
+            return ckpt, lib
+
+    raise FileNotFoundError(
+        "could not locate a template map (label_to_template_smarts.json). "
+        f"Tried: {', '.join(str(c) for c in candidates)}. "
+        "Pass templates_path= explicitly."
+    )
+
+
 @dataclass
 class TemplateLibrary:
     """A label -> retro SMARTS mapping, as emitted by the training pipeline."""
@@ -156,4 +328,11 @@ class TemplateLibrary:
         return self.templates.get(label)
 
 
-__all__ = ["TemplateOutcome", "TemplateLibrary", "apply_template"]
+__all__ = [
+    "TemplateOutcome",
+    "TemplateLibrary",
+    "apply_template",
+    "ForwardOutcome",
+    "apply_template_forward",
+    "load_template_library",
+]

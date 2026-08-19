@@ -111,4 +111,40 @@ def build_from_config(config: dict, num_classes: int) -> DMPNN:
     )
 
 
-__all__ = ["DMPNN", "build_from_config"]
+def load_dmpnn(checkpoint, device=None):
+    """Load a D-MPNN checkpoint into an eval-ready model.
+
+    Shared by the retro :class:`~synomega.singlestep.TemplateGNN` and the forward
+    :class:`~synomega.forward.ForwardTemplateGNN`: both consume the same
+    ml-template-gnn checkpoint format (``state["config" / "num_classes" / "model"]``).
+
+    Returns ``(model, config, num_classes, device)`` with the model already moved
+    to ``device`` and put in eval mode.
+
+    Raises ``RuntimeError`` when the checkpoint's input width disagrees with the
+    vendored featurizer — this checks the atom+bond width only, not fragment
+    handling.
+    """
+    state = torch.load(str(checkpoint), map_location="cpu", weights_only=False)
+    config = state["config"]
+    num_classes = int(state["num_classes"])
+
+    expected = state["model"]["W_input.weight"].shape[1]
+    if expected != ATOM_FDIM + BOND_FDIM:
+        raise RuntimeError(
+            f"feature dimension mismatch: checkpoint expects {expected} "
+            f"(atom+bond) but synomega.chem.features gives {ATOM_FDIM + BOND_FDIM}. "
+            f"The vendored featurizer is out of sync with this checkpoint."
+        )
+
+    dev = torch.device(
+        device if device is not None
+        else ("cuda" if torch.cuda.is_available() else "cpu")
+    )
+    model = build_from_config(config, num_classes)
+    model.load_state_dict(state["model"])
+    model = model.to(dev).eval()
+    return model, config, num_classes, dev
+
+
+__all__ = ["DMPNN", "build_from_config", "load_dmpnn"]

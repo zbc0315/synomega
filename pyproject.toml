@@ -46,3 +46,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "gnn: requires the torch/GNN extra and model weights",
+    "slow: long-running test",
+]
