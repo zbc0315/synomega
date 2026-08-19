@@ -11,7 +11,7 @@ template library with retrosynthesis; it does not aim for SOTA end-to-end accura
 ## 1. Model / algorithm architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
     R["Reactant SMILES<br/>A.B (multiple molecules)"] --> G["Graph featurization<br/>keep all fragments + Gasteiger"]
     G --> M["D-MPNN encoder"]
     M --> S["softmax over 64,366 templates"]

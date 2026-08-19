@@ -14,7 +14,7 @@ The plausibility model shipped with SynOmega is **`DualPlausibilityNet`** (check
 `plaus_dual-best.pt`) — a **dual-tower, atom-mapping-free** architecture:
 
 ```mermaid
-flowchart LR
+flowchart TD
     RIN["Reactant graph A.B<br/>(a single disconnected graph)"] --> ER["D-MPNN encoder<br/>enc_r"]
     PIN["Product graph"] --> EP["D-MPNN encoder<br/>enc_p (shares weights with enc_r)"]
     ER --> HR["h_r"]

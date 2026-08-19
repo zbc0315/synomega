@@ -10,7 +10,7 @@
 ## 1. 模型 / 算法架构
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["产物 SMILES"] --> G["图特征化<br/>largest fragment + Gasteiger<br/>ATOM_FDIM=45 / BOND_FDIM=12"]
     G --> M["D-MPNN 编码器<br/>hidden=300 depth=3"]
     M --> H1["模板头 → softmax(64,366)"]

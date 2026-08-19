@@ -12,7 +12,7 @@ SynOmega 随包发货的合理性模型是 **`DualPlausibilityNet`**（checkpoin
 一个**双塔（dual-tower）、无原子映射**的结构：
 
 ```mermaid
-flowchart LR
+flowchart TD
     RIN["反应物图 A.B<br/>（一个不连通图）"] --> ER["D-MPNN 编码器<br/>enc_r"]
     PIN["产物图"] --> EP["D-MPNN 编码器<br/>enc_p（与 enc_r 共享权重）"]
     ER --> HR["h_r"]

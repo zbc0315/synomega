@@ -9,7 +9,7 @@ D-MPNN 模板分类器，只是在应用阶段把逆合成模板**反转**后用
 ## 1. 模型 / 算法架构
 
 ```mermaid
-flowchart LR
+flowchart TD
     R["反应物 SMILES<br/>A.B（多分子）"] --> G["图特征化<br/>保留全部 fragment + Gasteiger"]
     G --> M["D-MPNN 编码器"]
     M --> S["softmax over 64,366 模板"]

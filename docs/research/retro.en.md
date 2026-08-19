@@ -13,7 +13,7 @@ prior).
 ## 1. Model / algorithm architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Product SMILES"] --> G["Graph featurization<br/>largest fragment + Gasteiger<br/>ATOM_FDIM=45 / BOND_FDIM=12"]
     G --> M["D-MPNN encoder<br/>hidden=300 depth=3"]
     M --> H1["Template head → softmax(64,366)"]
