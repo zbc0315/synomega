@@ -204,7 +204,73 @@ than merely split into solved/unsolved.
 All three share the AND-OR graph, the budget, and the route extractor, so their
 results are directly comparable.
 
+## Forward prediction
+
+The mirror of retrosynthesis: given reactants, rank the likely **products**. It
+reuses the same 64,366-template library and the same D-MPNN classifier, only
+inverting the retro templates and applying them forward with RDKit — so it is
+template-based, interpretable, and needs no extra training.
+
+```python
+from synomega.forward import ForwardTemplateGNN
+
+model = ForwardTemplateGNN.default()                 # downloads on first use
+for pred in model.predict("CC(=O)O.NCc1ccccc1", top_k=5):
+    print(pred.product, pred.score, pred.template_id)
+```
+
+## Multi-component evolution
+
+Starting from a set of reactants, repeatedly pick two molecules from a growing
+pool, run the forward model on the pair, and add the products back — growing a
+forward **synthesis network**. Each molecule carries a *total score*
+(`min(parent totals) × step probability`, starting reactants = 1.0) and a
+*synthesis-tree depth* (`max(parent depths) + 1`). Expansion is generational and
+best-first (highest-potential pairs first); scores **propagate** along the
+recorded reaction network so a molecule is never left under-scored, and every
+reaction edge is kept, so the result is a genuine network rather than one route
+per molecule.
+
+```python
+from synomega.forward import ForwardTemplateGNN, MultiComponentEvolution
+
+model = ForwardTemplateGNN.default()
+evo = MultiComponentEvolution(model, max_depth=3, score_threshold=0.01)
+
+# three-component Mannich: acetophenone + formaldehyde + dimethylamine
+result = evo.evolve(["CC(=O)c1ccccc1", "C=O", "CNC"])
+print(result.describe())
+for m in result.top(10, min_depth=1):
+    print(m.total_score, f"d{m.depth}", m.smiles)
+result.close()
+```
+
+Two backends give identical results and differ only in where data lives:
+`mode="memory"` (default) keeps everything in RAM for a handful of reactants;
+`mode="disk"` (needs `work_dir=`) spills the pool, edges, and reacted-pair set to
+SQLite for many starting reactants whose intermediates do not fit in RAM.
+`frontier_width=N` caps the O(n²) pairing fan-out per round.
+
 ## Command line
+
+```bash
+# one-time: precompute building-block InChIKeys so later loads take seconds
+synomega build-stock --catalogue catalogue.smi.gz --out building_blocks.keys.gz
+
+synomega plan  --target "CC(=O)Nc1ccccc1" --model path/to/model_run \
+               --stock building_blocks.keys.gz --stock-is-keys --max-steps 5
+
+synomega score --targets targets.smi --model path/to/model_run \
+               --stock building_blocks.keys.gz --stock-is-keys \
+               --max-steps 5 --out report.json
+
+# forward: reactants -> ranked products
+synomega forward "CC(=O)O.NCc1ccccc1" --top-k 5
+
+# multi-component evolution: grow a forward synthesis network from reactants
+synomega evolve --reactants "CC(=O)c1ccccc1.C=O.CNC" \
+                --max-depth 3 --score-threshold 0.01 --out network.json
+```
 
 ```bash
 # one-time: precompute building-block InChIKeys so later loads take seconds

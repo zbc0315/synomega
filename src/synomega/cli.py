@@ -137,6 +137,51 @@ def cmd_forward(args) -> int:
     return 0
 
 
+def cmd_evolve(args) -> int:
+    """Grow a forward synthesis network from starting reactants."""
+    from .forward import ForwardTemplateGNN, MultiComponentEvolution
+
+    if args.reactants_file:
+        reactants = [
+            line.split()[0]
+            for line in Path(args.reactants_file).read_text().splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
+    else:
+        reactants = [r for r in args.reactants.split(".") if r]
+    if not reactants:
+        print("no starting reactants given")
+        return 1
+
+    if args.model:
+        model = ForwardTemplateGNN.from_pretrained(
+            args.model, templates_path=args.templates,
+            device=args.device, topk_templates=args.topk_templates,
+        )
+    else:
+        model = ForwardTemplateGNN.default(
+            device=args.device, topk_templates=args.topk_templates,
+        )
+
+    evolver = MultiComponentEvolution(
+        model,
+        max_depth=args.max_depth,
+        score_threshold=args.score_threshold,
+        mode=args.mode,
+        work_dir=args.work_dir,
+        forward_top_k=args.forward_top_k,
+        allow_self_pair=args.allow_self_pair,
+        frontier_width=args.frontier_width,
+    )
+    result = evolver.evolve(reactants)
+    print(result.describe())
+    if args.out:
+        Path(args.out).write_text(result.to_json())
+        print(f"\nsaved -> {args.out}")
+    result.close()
+    return 0
+
+
 def cmd_build_stock(args) -> int:
     """Precompute InChIKeys once so later loads are fast."""
     from .stock import InMemoryStock
@@ -217,6 +262,41 @@ def build_parser() -> argparse.ArgumentParser:
                         help="label_to_template_smarts.json / templates TSV")
     sp_fwd.add_argument("--device", default=None)
     sp_fwd.set_defaults(func=cmd_forward)
+
+    sp_evo = sub.add_parser(
+        "evolve", help="grow a forward synthesis network from reactants")
+    sp_evo.add_argument("--reactants", default="",
+                        help="starting reactant SMILES; '.' separates individual "
+                             "starting molecules (each seeds the pool separately)")
+    sp_evo.add_argument("--reactants-file", default=None,
+                        help="file with one starting reactant SMILES per line "
+                             "(first whitespace-separated column)")
+    sp_evo.add_argument("--max-depth", type=int, required=True,
+                        help="max synthesis-tree depth (not step count)")
+    sp_evo.add_argument("--score-threshold", type=float, required=True,
+                        help="min total score for a molecule to be reactable")
+    sp_evo.add_argument("--mode", default="memory",
+                        choices=["memory", "disk", "auto"],
+                        help="'disk' spills intermediates to SQLite under --work-dir")
+    sp_evo.add_argument("--work-dir", default=None,
+                        help="directory for the SQLite store (disk mode)")
+    sp_evo.add_argument("--forward-top-k", type=int, default=5,
+                        help="products taken per reaction pair")
+    sp_evo.add_argument("--frontier-width", type=int, default=None,
+                        help="max selectable molecules paired per round (top by "
+                             "score); recommended for many starting reactants")
+    sp_evo.add_argument("--no-self-pair", dest="allow_self_pair",
+                        action="store_false",
+                        help="disallow a molecule reacting with itself (A+A)")
+    sp_evo.add_argument("--topk-templates", type=int, default=10)
+    sp_evo.add_argument("--model", default=None,
+                        help="run dir containing best.pt "
+                             "(default: download the forward model)")
+    sp_evo.add_argument("--templates", default=None,
+                        help="label_to_template_smarts.json / templates TSV")
+    sp_evo.add_argument("--device", default=None)
+    sp_evo.add_argument("--out", default=None)
+    sp_evo.set_defaults(func=cmd_evolve, allow_self_pair=True)
 
     sp_stock = sub.add_parser("build-stock", help="catalogue -> InChIKey file")
     sp_stock.add_argument("--catalogue", required=True)

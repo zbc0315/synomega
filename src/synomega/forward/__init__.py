@@ -13,13 +13,32 @@ from __future__ import annotations
 
 from .base import ForwardModel, ForwardPrediction
 
-__all__ = ["ForwardModel", "ForwardPrediction", "ForwardTemplateGNN"]
+__all__ = [
+    "ForwardModel",
+    "ForwardPrediction",
+    "ForwardTemplateGNN",
+    "MultiComponentEvolution",
+    "EvolutionResult",
+    "PoolMolecule",
+    "build_evolver",
+]
+
+# Names served lazily from a submodule, so `import synomega.forward` stays cheap
+# (the GNN backend pulls in torch; evolution only needs it via the model passed in).
+_LAZY = {
+    "ForwardTemplateGNN": "template_gnn",
+    "MultiComponentEvolution": "evolution",
+    "EvolutionResult": "evolution",
+    "PoolMolecule": "evolution",
+    "build_evolver": "evolution",
+}
 
 
 def __getattr__(name: str):
-    # Deferred so `import synomega` does not pull in torch.
-    if name == "ForwardTemplateGNN":
-        from .template_gnn import ForwardTemplateGNN
+    module = _LAZY.get(name)
+    if module is not None:
+        import importlib
 
-        return ForwardTemplateGNN
+        mod = importlib.import_module(f".{module}", __name__)
+        return getattr(mod, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

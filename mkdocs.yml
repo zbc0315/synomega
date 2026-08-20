@@ -50,6 +50,7 @@ nav:
   - 研究报告:
       - 总览与评测协议: research/index.md
       - 单步正向反应预测: research/forward.md
+      - 多组分演化预测: research/evolution.md
       - 单步逆向反应预测: research/retro.md
       - 多步反应路径规划: research/planning.md
       - 反应合理性评分: research/plausibility.md
@@ -102,6 +103,7 @@ plugins:
             研究报告: Research Report
             总览与评测协议: Overview & Evaluation Protocol
             单步正向反应预测: Single-step Forward Prediction
+            多组分演化预测: Multi-component Evolution
             单步逆向反应预测: Single-step Retrosynthesis
             多步反应路径规划: Multi-step Route Planning
             反应合理性评分: Reaction Plausibility

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synomega"
-version = "0.7.0"
-description = "Retrosynthesis toolkit: single-step prediction, multi-step route planning, synthesizability scoring"
+version = "0.8.0"
+description = "Retrosynthesis toolkit: single-step forward/retro prediction, multi-component evolution, route planning, synthesizability scoring"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
