@@ -30,6 +30,19 @@ plausibility, synthesizability scoring) with architectures, pseudocode, training
 sets, and evaluation figures — is published at
 **<https://zbc0315.github.io/synomega/>** (built from `docs/` on every push).
 
+## Agent skill
+
+Driving an AI coding agent (Claude Code, OpenClaw, …)? Install the **SynOmega
+skill** so the agent can call all six capabilities directly — single-step retro
+and forward prediction, route planning, synthesizability scoring, plausibility
+screening, and multi-component evolution:
+
+```bash
+clawhub install synomega
+```
+
+Source and manual install: **<https://github.com/zbc0315/synomega-skill>**.
+
 ## Installation
 
 ```bash

@@ -39,6 +39,10 @@ The single-step retrosynthesis, multi-step search, and synthesizability scoring 
 - **[Feature Guide](guide/index.md)** — one chapter per feature, covering installation and command-line / Python-API usage (matching the research-report chapters one-to-one).
 - **[Research Report](research/index.md)** — chapter-by-chapter model/algorithm architecture, pseudocode, training sets, evaluation metrics, and figures for each capability module. The evaluation protocol, terminology, and data conventions are defined centrally in that chapter's [Overview](research/index.md) and referenced by each capability chapter.
 
+!!! tip "Driving an AI agent (Claude Code / OpenClaw / …)?"
+    Install the **SynOmega skill** and the agent can call all six capabilities directly: `clawhub install synomega`.
+    Source and manual install: [github.com/zbc0315/synomega-skill](https://github.com/zbc0315/synomega-skill).
+
 !!! note "On the training-data conventions"
     All models described here are trained on a **large-scale atom-mapped commercial
     reaction corpus**. The raw reactions are not distributed with the software; what is
