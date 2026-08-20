@@ -46,7 +46,7 @@ theme:
 
 nav:
   - 简介: index.md
-  - 主要功能: features.md
+  - 功能介绍: guide.md
   - 研究报告:
       - 总览与评测协议: research/index.md
       - 单步正向反应预测: research/forward.md
@@ -99,7 +99,7 @@ plugins:
           build: true
           nav_translations:
             简介: Introduction
-            主要功能: Features
+            功能介绍: Feature Guide
             研究报告: Research Report
             总览与评测协议: Overview & Evaluation Protocol
             单步正向反应预测: Single-step Forward Prediction
