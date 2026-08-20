@@ -31,15 +31,22 @@ Each molecule carries two quantities (exactly as specified):
 
 ```mermaid
 flowchart TD
-    S["starting reactants<br/>total=1.0, depth=0"] --> P["molecule pool"]
-    P --> R["select reactable<br/>total≥threshold and depth&lt;max_depth"]
+    S["starting reactants<br/>total=1.0, depth=0"] -->|seed| POOL
+    POOL["molecule pool (store)<br/>every molecule + its total/depth"] --> R["select reactable<br/>total≥threshold and depth&lt;max_depth<br/>(changed-this-round × all reactable)"]
+    R -->|no reactable pair| END["stop<br/>exhausted / max_reactions / max_pool_size"]
     R --> PAIR["pair up<br/>by min(parent totals) desc<br/>skip reacted pairs / optionally forbid A+A"]
     PAIR --> FWD["batched forward prediction<br/>top-k products per pair"]
-    FWD --> REC["record reaction edges + product nodes<br/>drop product==reactant"]
+    FWD --> REC["record reaction edges<br/>drop product==reactant"]
+    REC -->|new product nodes written to pool<br/>ensure_placeholder| POOL
     REC --> RELAX["score propagation<br/>max-product relaxation over the reaction DAG"]
-    RELAX -->|molecules whose score improved → next frontier| R
-    RELAX -->|no new reactable pair| END["stop: exhausted / max_reactions / max_pool_size"]
+    RELAX -->|updated total/depth written back upsert<br/>improved molecules = next frontier| POOL
 ```
+
+The **pool is the central store**: each round selects reactable molecules from it
+(read), then writes **new product nodes** into it and writes back the **updated
+totals/depths** from propagation (two writes), and the next round selects from the
+grown pool — so the pool updates every generation rather than being filled once and
+left static.
 
 **Generational**: each round pairs only "molecules whose score changed this
 round" × "all reactable molecules", avoiding re-enumeration of the whole pool;

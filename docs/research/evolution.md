@@ -24,15 +24,18 @@
 
 ```mermaid
 flowchart TD
-    S["起始反应物<br/>total=1.0, depth=0"] --> P["分子池"]
-    P --> R["筛可反应分子<br/>total≥阈值 且 depth&lt;max_depth"]
+    S["起始反应物<br/>total=1.0, depth=0"] -->|注入| POOL
+    POOL["分子池（store）<br/>全部分子 + 各自总分/深度"] --> R["选可反应分子<br/>total≥阈值 且 depth&lt;max_depth<br/>（本代有变化的 × 全部可反应）"]
+    R -->|无可反应对| END["终止<br/>exhausted / max_reactions / max_pool_size"]
     R --> PAIR["配对<br/>按 min(两父总分) 降序<br/>跳过已反应对 / 可选禁 A+A"]
     PAIR --> FWD["批量正向预测<br/>每对取 top-k 产物"]
-    FWD --> REC["记录反应边 + 产物节点<br/>过滤 产物==反应物"]
-    REC --> RELAX["分数回传播<br/>沿反应 DAG 做 max-积松弛"]
-    RELAX -->|有分子分数提升→下一代前沿| R
-    RELAX -->|无新可反应对| END["终止：exhausted / max_reactions / max_pool_size"]
+    FWD --> REC["记录反应边<br/>过滤 产物==反应物"]
+    REC -->|新产物节点写入池<br/>ensure_placeholder| POOL
+    REC --> RELAX["分数回传播<br/>沿反应 DAG max-积松弛"]
+    RELAX -->|更新总分/深度写回池 upsert<br/>提升的分子=下一代前沿| POOL
 ```
+
+图中**分子池是中心 store**：每代从池里选可反应分子（读），正向预测后把**新产物节点写入池**、再由回传把**更新的总分/深度写回池**（两次写），下一代再从长大的池里选——所以池是逐代更新的，不是一次性填满后静止。
 
 **分代（generational）**：每一代只对"本代分数有变化的可反应分子"× "全部可反应分子"配对，
 避免重复枚举整池；配对按 `min(两父总分)` 降序——这是产物总分的上界，因此**最有潜力的对先反应**。
