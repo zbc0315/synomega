@@ -46,7 +46,14 @@ theme:
 
 nav:
   - 简介: index.md
-  - 功能介绍: guide.md
+  - 功能介绍:
+      - 安装与总览: guide/index.md
+      - 单步正向反应预测: guide/forward.md
+      - 多组分演化预测: guide/evolution.md
+      - 单步逆向反应预测: guide/retro.md
+      - 多步反应路径规划: guide/planning.md
+      - 反应合理性评分: guide/plausibility.md
+      - 可合成性评分 SynScore: guide/synscore.md
   - 研究报告:
       - 总览与评测协议: research/index.md
       - 单步正向反应预测: research/forward.md
@@ -100,6 +107,7 @@ plugins:
           nav_translations:
             简介: Introduction
             功能介绍: Feature Guide
+            安装与总览: Install & Overview
             研究报告: Research Report
             总览与评测协议: Overview & Evaluation Protocol
             单步正向反应预测: Single-step Forward Prediction

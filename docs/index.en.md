@@ -36,7 +36,7 @@ The single-step retrosynthesis, multi-step search, and synthesizability scoring 
 
 ## Documentation guide
 
-- **[Feature Guide](guide.md)** — one section per feature, covering installation and command-line / Python-API usage (matching the research-report chapters one-to-one).
+- **[Feature Guide](guide/index.md)** — one chapter per feature, covering installation and command-line / Python-API usage (matching the research-report chapters one-to-one).
 - **[Research Report](research/index.md)** — chapter-by-chapter model/algorithm architecture, pseudocode, training sets, evaluation metrics, and figures for each capability module. The evaluation protocol, terminology, and data conventions are defined centrally in that chapter's [Overview](research/index.md) and referenced by each capability chapter.
 
 !!! note "On the training-data conventions"
